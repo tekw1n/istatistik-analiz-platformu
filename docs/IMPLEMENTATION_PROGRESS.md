@@ -112,19 +112,20 @@ Rules:
 | 5 | Done, approved; merged as `0f30cbd` | `feat/phase-05-data-entry` | `4dcdba7`, `8f7f301`, `9435130`, `869fd75`, `d4f8549` | [#6](https://github.com/tekw1n/istatistik-analiz-platformu/pull/6) | 601 passed, build succeeds; manual browser smoke test (Chromium) |
 | 6 | Done, approved; merged as `3115206` | `feat/phase-06-analysis-ui` | `6f94ca2`, `3635657`, `84c2e23`, `4e60178` | [#7](https://github.com/tekw1n/istatistik-analiz-platformu/pull/7) | 650 passed, build succeeds; browser smoke test (Chromium) |
 | 7 | Done, approved; merged as `e6d5567` | `feat/phase-07-charts-calculator` | `405f2e1`, `b8ee413`, `41c136c` | [#8](https://github.com/tekw1n/istatistik-analiz-platformu/pull/8) | 677 passed, build succeeds; browser smoke test (Chromium) |
-| 8 | Done, awaiting user approval | `feat/phase-08-reporting-design` | `7cfee42`, `949997a`, `7a36854`, `44f4256` | [#9](https://github.com/tekw1n/istatistik-analiz-platformu/pull/9) | 703 passed, build succeeds; keyboard, report and PDF smoke test (Chromium) |
-| 9 | Not started | | | | |
+| 8 | Done, approved; merged as `8e21532` | `feat/phase-08-reporting-design` | `7cfee42`, `949997a`, `7a36854`, `44f4256` | [#9](https://github.com/tekw1n/istatistik-analiz-platformu/pull/9) | 703 passed, build succeeds; keyboard, report and PDF smoke test (Chromium) |
+| 9 | Done, awaiting user approval | `test/phase-09-final-validation` | `b4e1b54`, `a91d37f`, `ba9741e`, `1d483eb`, `651198d`, `c5f12bd`, `c94737d` | PR_LINK | 772 passed, build succeeds without warnings; references reproduced; browser tests on a subdirectory build |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
 ## Known bugs and gaps
 
-- The main bundle is above 500 kB (mostly KaTeX); Vite warns about it. Charts load as a separate chunk.
+- KaTeX and the charts are separate chunks; no chunk exceeds 500 kB. KaTeX is still loaded with the first page.
 - Charts show at most 60 classes (frequency chart) or 300 values (discrete probability chart). Open classes have no histogram bar.
 - With grouped data the end classes are opened to ±∞, so a Continuous Uniform fit can leave the table bounds (a = −4,72 in the service time sample). By user decision the estimator is unchanged and a warning is shown.
 - Tables show at most 500 rows, the report data table 200 (totals cover all rows).
 - Printing was verified with Chromium only; Firefox, Safari, a physical printer and a screen reader were not tried.
-- For grouped-data moment estimates the approximate p-value note speaks of observation values, although class midpoints were used (the midpoint note appears beside it).
+- Parameters far above one million cannot be evaluated; the UI explains this.
+- No site is published yet: GitHub Pages and Vercel must be enabled by the repository owner (see README). The Pages workflow has never run.
 - There are no automated UI component tests; parsing, validation and samples are unit tested.
 - Raw data entries accept one variable of at most 100,000 values; CSV files up to 5 MB. Quoted fields spanning several lines are not supported.
 - `regularizedGammaP/Q` are limited to shapes up to about 1e6 (see the `shortcut:` comment in `src/math/gamma.ts`).
@@ -204,8 +205,14 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - Keyboard: skip link, Enter / Shift+Enter between table cells, focus kept after adding or deleting rows, Home / End in tabs, focusable scroll areas, Escape closes the report.
 - Empty states and an error boundary explain what to do next.
 
-## Next: Phase 9
+## Phase 9 decisions
 
-1. Full test run and build, repository check.
-2. GitHub Pages and Vercel deployment documentation (Vite `base` for Pages).
-3. Check the completion criteria of the specification.
+- The approximate p-value note names its source: observation values, class midpoints or manual entry.
+- Vite 8 replaced `manualChunks` with `rolldownOptions.output.codeSplitting`; KaTeX has its own chunk.
+- `base: './'` serves both a domain root and a GitHub Pages subdirectory.
+- `tests/architecture.test.ts` enforces the engine layering.
+- The GitHub Pages workflow runs only on manual dispatch.
+
+## Next
+
+All planned phases are implemented. Remaining: user approval and, if wanted, enabling a deployment.
