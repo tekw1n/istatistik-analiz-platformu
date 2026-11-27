@@ -93,9 +93,9 @@ Rules:
 
 - One branch per phase, cut from an up-to-date `main`. The only direct commit on `main` is the bootstrap `.gitignore` commit.
 - Conventional Commits in English. Pull request descriptions in Turkish.
-- Per phase: tests and build → commits → push → PR → `gh pr merge --merge --delete-branch` → `git pull --ff-only origin main`.
+- Per phase: tests and build → commits → push → PR → `gh pr merge --merge --delete-branch --author-email 234227956+tekw1n@users.noreply.github.com` → `git pull --ff-only origin main`.
 - Never force-push or delete `main` or unmerged branches.
-- Commit email is set locally to the GitHub noreply address.
+- Commit email is set locally to the GitHub noreply address; merges need the `--author-email` flag as well. Merge commit `1cc734a` carries the personal address; the user chose to leave it.
 - Stop after each phase, report, and wait for explicit approval.
 
 ## Progress
@@ -103,17 +103,28 @@ Rules:
 | Phase | Status | Branch | Commits | PR | Tests |
 |---|---|---|---|---|---|
 | Bootstrap | Done | `main` | `7f91b34` | — | — |
-| 0 | Done, awaiting user approval | `chore/phase-00-project-setup` | `50295a5` and the progress-record commit | [#1](https://github.com/tekw1n/istatistik-analiz-platformu/pull/1) | Not applicable, no code yet |
-| 1–9 | Not started | | | | |
+| 0 | Done, approved; merged as `1cc734a` | `chore/phase-00-project-setup` | `50295a5` and the progress-record commit | [#1](https://github.com/tekw1n/istatistik-analiz-platformu/pull/1) | Not applicable, no code yet |
+| 1 | Done, awaiting user approval | `feat/phase-01-math-core` | `a0e512e`, `e0255d1`, `a6c88f2`, `b150115` | [#2](https://github.com/tekw1n/istatistik-analiz-platformu/pull/2) | 264 passed, build succeeds |
+| 2–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
 ## Known bugs and gaps
 
-None. There is no application code yet.
+- The UI is only a Turkish placeholder page. Tailwind CSS, Recharts and KaTeX are added in the phases that first use them.
+- `regularizedGammaP/Q` are limited to shapes up to about 1e6 (see the `shortcut:` comment in `src/math/gamma.ts`).
+- `integrate` handles finite intervals only and can miss a feature narrower than 1/32 of the interval.
 
-## Next: Phase 1
+## Phase 1 decisions
 
-1. Scaffold Vite + React + TypeScript (strict) and Vitest.
-2. Implement the mathematical functions listed in the phase plan.
-3. Verify them against independent reference values.
+- `erf` / `erfc` are computed from the regularized incomplete gamma, so one implementation serves erf, normal and χ² tails. The planned `specialFunctions.ts` was not needed.
+- `inverseRegularizedGammaQ(a, α)` inverts the upper tail directly; the χ² critical value is `2 · inverseRegularizedGammaQ(df / 2, α)`.
+- `logGamma` and `digamma` accept x > 0 only; `gamma` also accepts negative non-integers.
+- `describe` returns null for undefined statistics. CV and variance/mean ratio use s² (divisor N − 1) and are defined only for a positive mean.
+- Reference values come from `tests/math/generate_references.py` (mpmath, 40 digits), independent of the TypeScript code.
+
+## Next: Phase 2
+
+1. Define the common distribution interface (PMF/PDF, CDF, SF, interval probability, validation, support).
+2. Implement the five discrete and five continuous distributions on top of `src/math`.
+3. Test them against independent reference values.
