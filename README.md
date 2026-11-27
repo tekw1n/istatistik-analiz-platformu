@@ -1,102 +1,106 @@
-# Probability Distributions and Chi-Square Goodness-of-Fit Platform
+**Türkçe** | [English](README.en.md)
 
-An interactive web application for a university statistics course. The whole user interface is in Turkish. Every calculation runs in the browser: there is no backend and no data leaves the device.
+**Canlı demo:** <https://tekw1n.github.io/istatistik-analiz-platformu/>
 
-## Features
+# Olasılık Dağılımları ve Ki-Kare Uyum İyiliği Analiz Platformu
 
-- **Data entry:** discrete frequency table (with an open class X ≥ k), grouped continuous table (with open end classes), raw data and CSV (Turkish `;` + decimal comma and standard CSV), spreadsheet paste, Sturges classification, five sample problems.
-- **Distributions:** Binomial, Poisson, Discrete Uniform, Geometric (both definitions), Bernoulli, Normal, Exponential, Continuous Uniform, Gamma, Log-Normal.
-- **Estimation:** Method of Moments and Maximum Likelihood (raw, frequency table, grouped and censored data), or manual parameters.
-- **Chi-Square test:** expected frequencies, tail closing, merging of classes with E < 5 with its history, statistic, p-value, critical value and decision.
-- **Presentation:** step-by-step formulas, comparison of all applicable distributions, charts, probability calculator, printable A4 report.
+Üniversite istatistik dersi için hazırlanmış interaktif bir web uygulaması. Arayüzün tamamı Türkçedir. Bütün hesaplamalar tarayıcıda yapılır: sunucu tarafı yoktur ve hiçbir veri cihazdan dışarı gönderilmez.
 
-## Run locally
+## Özellikler
 
-Requires Node.js 22.12 or newer.
+- **Veri girişi:** kesikli frekans tablosu (X ≥ k açık uçlu sınıfıyla), sürekli gruplandırılmış tablo (açık uçlu ilk ve son sınıfla), ham veri ve CSV (Türkçe `;` ayraçlı ve virgül ondalıklı biçim ile standart CSV), Excel'den tablo yapıştırma, Sturges sınıflandırması, beş hazır örnek soru.
+- **Dağılımlar:** Binom, Poisson, Kesikli Düzgün, Geometrik (iki tanımıyla), Bernoulli, Normal, Üstel, Sürekli Düzgün, Gamma, Log-Normal.
+- **Parametre kestirimi:** Momentler Metodu (M.M.) ve En Çok Olabilirlik (EÇOK; ham veri, frekans tablosu, gruplandırılmış ve sansürlü veri) veya elle parametre girişi.
+- **Ki-Kare testi:** beklenen frekanslar, kuyruk kapatma, Eᵢ < 5 olan sınıfların işlem geçmişiyle birleştirilmesi, test istatistiği, p-değeri, kritik değer ve karar.
+- **Sunum:** adım adım formüller, uygulanabilir tüm dağılımların karşılaştırılması, grafikler, olasılık hesaplayıcı, yazdırılabilir A4 raporu.
+
+## Yerel çalıştırma
+
+Node.js 22.12 veya daha yeni bir sürüm gerekir.
 
 ```bash
 npm ci
-npm run dev       # development server, http://localhost:5173
-npm test          # unit tests (Vitest)
-npm run build     # type check and production build into dist/
-npm run preview   # serve the production build
+npm run dev       # geliştirme sunucusu, http://localhost:5173
+npm test          # birim testleri (Vitest)
+npm run build     # tip denetimi ve dist/ klasörüne üretim derlemesi
+npm run preview   # üretim derlemesini sunar
 ```
 
-## Statistical conventions
+## İstatistiksel kurallar
 
-| Topic | Convention |
+| Konu | Kural |
 |---|---|
-| Variances | s² divides by N − 1; the moment variance m₂ divides by N and is used by both estimators of σ² |
-| Binomial | n is known; only p is estimated |
-| Geometric | Trials (X = 1, 2, …) by default; failures (X = 0, 1, …) selectable |
-| Normal, Log-Normal | Parameterised by σ (σ² is shown as well) |
-| Exponential, Gamma | Rate λ; shape α and scale θ |
-| Grouped likelihood | Maximises Σ fᵢ ln Pᵢ(θ); midpoints are never treated as observations |
-| Test classes | End classes of continuous data are opened to ±∞, so ΣEᵢ = N |
-| Merging | Lower tail, then upper tail, then the leftmost interior class with E < 5 into its smaller neighbour (left on a tie) |
-| Degrees of freedom | k' − 1 − m, where m counts parameters estimated from the tested data; no test when it is ≤ 0 |
-| Decision | Reject H₀ when p < α. Not rejecting never proves that a distribution is correct |
+| Varyanslar | s², N − 1'e bölünür; moment varyansı m₂, N'e bölünür ve σ² kestiriminde her iki yöntemde de kullanılır |
+| Binom | n bilinir; yalnızca p kestirilir |
+| Geometrik | Varsayılan tanım deneme sayısıdır (X = 1, 2, …); başarısızlık sayısı (X = 0, 1, …) seçilebilir |
+| Normal, Log-Normal | Parametre σ'dır (σ² de gösterilir) |
+| Üstel, Gamma | Üstel dağılımda hız λ; Gamma dağılımında şekil α ve ölçek θ |
+| Gruplandırılmış EÇOK | Σ fᵢ ln Pᵢ(θ) maksimize edilir; sınıf orta noktaları hiçbir zaman gözlem sayılmaz |
+| Test sınıfları | Sürekli veride ilk ve son sınıf ±∞ yönünde açılır, böylece ΣEᵢ = N olur |
+| Birleştirme | Önce alt kuyruk, sonra üst kuyruk; ardından Eᵢ < 5 olan en soldaki ara sınıf, beklenen frekansı daha küçük olan komşusuyla birleşir (eşitlikte sol komşu) |
+| Serbestlik derecesi | sd = k' − 1 − m; m, test edilen veriden kestirilen parametre sayısıdır. sd ≤ 0 ise test uygulanmaz |
+| Karar | p < α ise H₀ reddedilir. H₀'ın reddedilememesi dağılımın doğru olduğunu kanıtlamaz |
 
-A p-value is marked approximate when the parameters were not estimated by maximum likelihood from the final test classes: moment estimates, raw continuous data, manual values marked as estimated, and likelihood fits whose classes were merged afterwards.
+Parametreler, nihai test sınıflarından en çok olabilirlik yöntemiyle kestirilmediğinde p-değeri "yaklaşık" olarak işaretlenir: moment kestirimleri, sürekli ham veri, "veriden kestirildi" olarak işaretlenen elle girilmiş değerler ve sınıfları sonradan birleştirilen olabilirlik kestirimleri.
 
-## Architecture
+## Mimari
 
 ```text
 src/
-├── math/            special functions, root finding, integration, optimisation, statistics
-├── distributions/   ten distributions, catalog, estimation
-├── chiSquare/       classes, merging, statistic, hypothesis test
-├── features/        data entry, analysis, comparison, calculator, report
-├── components/      shared UI and charts
-└── utils/           Turkish number formatting
-tests/               unit tests, reference generators, architecture rules
+├── math/            özel fonksiyonlar, kök bulma, integral, optimizasyon, istatistikler
+├── distributions/   on dağılım, dağılım kataloğu, parametre kestirimi
+├── chiSquare/       sınıflar, birleştirme, test istatistiği, hipotez testi
+├── features/        veri girişi, analiz, karşılaştırma, hesaplayıcı, rapor
+├── components/      ortak arayüz bileşenleri ve grafikler
+└── utils/           Türkçe sayı biçimlendirme
+tests/               birim testleri, referans üreticiler, mimari kuralları
 ```
 
-`math`, `distributions` and `chiSquare` are plain TypeScript without React or DOM access, and depend only downwards. `tests/architecture.test.ts` enforces this and rejects import cycles. The decisions and history of every development phase are in [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md).
+`math`, `distributions` ve `chiSquare`, React veya DOM erişimi olmayan saf TypeScript modülleridir ve yalnızca alt katmanlara bağımlıdır. `tests/architecture.test.ts` bu kuralı zorunlu tutar ve döngüsel bağımlılıkları reddeder. Geliştirme aşamalarının kararları ve geçmişi [docs/IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md) dosyasındadır (İngilizce).
 
-## Reference values
+## Referans değerler
 
-Numerical references are produced with [mpmath](https://mpmath.org/) independently of the TypeScript code. To regenerate them (needs Python 3 and `pip install mpmath`):
+Sayısal referanslar, TypeScript kodundan bağımsız olarak [mpmath](https://mpmath.org/) ile üretilir. Yeniden üretmek için Python 3 ve `pip install mpmath` gerekir:
 
 ```bash
 for script in tests/*/generate*references.py; do python3 "$script"; done
-git diff --stat   # no change expected
+git diff --stat   # değişiklik beklenmez
 ```
 
-## Deployment
+## Dağıtım
 
-The build in `dist/` is a static site with relative asset paths, so it works at a domain root and in a subdirectory.
+`dist/` klasöründeki derleme, göreli dosya yolları kullanan statik bir sitedir; hem alan adının kökünde hem de bir alt dizinde çalışır.
 
 ### Vercel
 
-1. Sign in at [vercel.com](https://vercel.com) with GitHub and choose **Add New… → Project**.
-2. Import this repository.
-3. Keep the detected settings: framework **Vite**, build command `npm run build`, output directory `dist`. No environment variables are needed.
-4. Press **Deploy**. Every later push to `main` is deployed automatically.
+1. [vercel.com](https://vercel.com) adresine GitHub ile giriş yapın ve **Add New… → Project** seçeneğini seçin.
+2. Bu depoyu içe aktarın.
+3. Algılanan ayarları değiştirmeyin: framework **Vite**, derleme komutu `npm run build`, çıktı klasörü `dist`. Ortam değişkeni gerekmez.
+4. **Deploy** düğmesine basın. Sonrasında `main` dalına yapılan her push otomatik olarak yayınlanır.
 
-From a terminal instead: `npx vercel` for a preview, `npx vercel --prod` for production.
+Terminalden yayınlamak için: önizleme `npx vercel`, üretim `npx vercel --prod`.
 
 ### GitHub Pages
 
-The workflow `.github/workflows/deploy-pages.yml` tests, builds and publishes the site. It starts only when run by hand.
+`.github/workflows/deploy-pages.yml` iş akışı testleri çalıştırır, siteyi derler ve yayınlar. Yalnızca elle başlatıldığında çalışır.
 
-1. In the repository open **Settings → Pages** and set **Source** to **GitHub Actions**.
-2. Open **Actions → Deploy to GitHub Pages → Run workflow** on `main`, or run `gh workflow run deploy-pages.yml`.
-3. The site appears at `https://<user>.github.io/<repository>/`.
+1. Depoda **Settings → Pages** sayfasını açın ve **Source** değerini **GitHub Actions** yapın.
+2. **Actions → Deploy to GitHub Pages → Run workflow** ile `main` dalında çalıştırın veya `gh workflow run deploy-pages.yml` komutunu kullanın.
+3. Bu deponun sitesi <https://tekw1n.github.io/istatistik-analiz-platformu/> adresindedir (kopyalanan depolarda `https://<kullanıcı>.github.io/<depo>/`).
 
-To publish on every push to `main`, add this under `on:` in the workflow:
+Her `main` push'unda yayınlamak için iş akışında `on:` altına şunu ekleyin:
 
 ```yaml
   push:
     branches: [main]
 ```
 
-## Known limitations
+## Bilinen sınırlamalar
 
-- Shape or mean parameters far above one million cannot be evaluated; the application says so instead of showing a result.
-- Binomial n is limited to 1,000,000, and a chi-square test to 10,000 discrete classes.
-- Grouped and censored likelihoods are solved numerically (relative accuracy about 1e-7); grouped two-parameter fits need at least three occupied classes.
-- For grouped data a Continuous Uniform fit can leave the bounds of the table; a warning is shown.
-- Raw data accepts one variable of up to 100,000 values (CSV files up to 5 MB); quoted fields spanning lines are not supported.
-- Charts show at most 60 classes or 300 discrete values; tables show at most 500 rows (the report data table 200). Totals cover all rows.
-- Browser checks were done with Chromium only. Firefox, Safari, physical printing and screen readers have not been tested. There are no automated UI component tests.
+- Şekil veya ortalama parametresi bir milyonun çok üzerindeyse hesap yapılamaz; uygulama sonuç göstermek yerine bunu bildirir.
+- Binom dağılımında n en fazla 1.000.000, Ki-Kare testinde kesikli sınıf sayısı en fazla 10.000'dir.
+- Gruplandırılmış ve sansürlü veride EÇOK sayısal olarak çözülür (bağıl hassasiyet yaklaşık 1e-7); iki parametreli gruplandırılmış kestirim, gözlem içeren en az üç sınıf gerektirir.
+- Gruplandırılmış veride Sürekli Düzgün kestirimi tablo sınırlarının dışına çıkabilir; bu durumda uyarı gösterilir.
+- Ham veri girişi en fazla 100.000 değerlik tek değişken kabul eder (CSV dosyaları en fazla 5 MB); birden çok satıra yayılan tırnaklı alanlar desteklenmez.
+- Grafikler en fazla 60 sınıf veya 300 kesikli değer, tablolar en fazla 500 satır (rapordaki veri tablosu 200 satır) gösterir. Toplamlar tüm satırları kapsar.
+- Tarayıcı denemeleri yalnızca Chromium ile yapılmıştır. Firefox, Safari, fiziksel yazıcı ve ekran okuyucu denenmemiştir. Otomatik arayüz bileşen testi yoktur.
