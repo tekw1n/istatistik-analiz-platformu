@@ -113,7 +113,7 @@ Rules:
 | 6 | Done, approved; merged as `3115206` | `feat/phase-06-analysis-ui` | `6f94ca2`, `3635657`, `84c2e23`, `4e60178` | [#7](https://github.com/tekw1n/istatistik-analiz-platformu/pull/7) | 650 passed, build succeeds; browser smoke test (Chromium) |
 | 7 | Done, approved; merged as `e6d5567` | `feat/phase-07-charts-calculator` | `405f2e1`, `b8ee413`, `41c136c` | [#8](https://github.com/tekw1n/istatistik-analiz-platformu/pull/8) | 677 passed, build succeeds; browser smoke test (Chromium) |
 | 8 | Done, approved; merged as `8e21532` | `feat/phase-08-reporting-design` | `7cfee42`, `949997a`, `7a36854`, `44f4256` | [#9](https://github.com/tekw1n/istatistik-analiz-platformu/pull/9) | 703 passed, build succeeds; keyboard, report and PDF smoke test (Chromium) |
-| 9 | Done, awaiting user approval | `test/phase-09-final-validation` | `b4e1b54`, `a91d37f`, `ba9741e`, `1d483eb`, `651198d`, `c5f12bd`, `c94737d` | [#10](https://github.com/tekw1n/istatistik-analiz-platformu/pull/10) | 772 passed, build succeeds without warnings; references reproduced; browser tests on a subdirectory build |
+| 9 | Done, approved; merged as `563c26b` | `test/phase-09-final-validation` | `b4e1b54`, `a91d37f`, `ba9741e`, `1d483eb`, `651198d`, `c5f12bd`, `c94737d` | [#10](https://github.com/tekw1n/istatistik-analiz-platformu/pull/10) | 772 passed, build succeeds without warnings; references reproduced; browser tests on a subdirectory build |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
@@ -125,7 +125,7 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - Tables show at most 500 rows, the report data table 200 (totals cover all rows).
 - Printing was verified with Chromium only; Firefox, Safari, a physical printer and a screen reader were not tried.
 - Parameters far above one million cannot be evaluated; the UI explains this.
-- No site is published yet: GitHub Pages and Vercel must be enabled by the repository owner (see README). The Pages workflow has never run.
+- Vercel is documented but not set up. The GitHub Pages workflow is manual, so the live site changes only when it is run again.
 - There are no automated UI component tests; parsing, validation and samples are unit tested.
 - Raw data entries accept one variable of at most 100,000 values; CSV files up to 5 MB. Quoted fields spanning several lines are not supported.
 - `regularizedGammaP/Q` are limited to shapes up to about 1e6 (see the `shortcut:` comment in `src/math/gamma.ts`).
@@ -213,6 +213,12 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - `tests/architecture.test.ts` enforces the engine layering.
 - The GitHub Pages workflow runs only on manual dispatch.
 
+## Deployment
+
+- GitHub Pages is enabled with GitHub Actions as its source: <https://tekw1n.github.io/istatistik-analiz-platformu/>
+- First deployment: workflow run `46018096452` from `563c26b`. The live site was checked in Chromium (five samples and their reports, no failed or external requests, no console errors).
+- `README.md` is Turkish, `README.en.md` English.
+
 ## Next
 
-All planned phases are implemented. Remaining: user approval and, if wanted, enabling a deployment.
+All planned phases are implemented and the site is published. No open task.
