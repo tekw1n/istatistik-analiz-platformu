@@ -107,8 +107,9 @@ Rules:
 | 0 | Done, approved; merged as `1cc734a` | `chore/phase-00-project-setup` | `50295a5` and the progress-record commit | [#1](https://github.com/tekw1n/istatistik-analiz-platformu/pull/1) | Not applicable, no code yet |
 | 1 | Done, approved; merged as `f579184` | `feat/phase-01-math-core` | `a0e512e`, `e0255d1`, `a6c88f2`, `b150115` | [#2](https://github.com/tekw1n/istatistik-analiz-platformu/pull/2) | 264 passed, build succeeds |
 | 2 | Done, approved; merged as `8c1afa7` | `feat/phase-02-distributions` | `d84dfd5`, `8b914f1`, `4b7bc9b`, `9d0e249`, `30b2b8d` | [#3](https://github.com/tekw1n/istatistik-analiz-platformu/pull/3) | 426 passed in total, build succeeds |
-| 3 | Done, awaiting user approval | `feat/phase-03-parameter-estimation` | `bbcb668`, `ce0d85a`, `d05d9a6`, `ad113e0`, `c6e21cb`, `d1355de` | [#4](https://github.com/tekw1n/istatistik-analiz-platformu/pull/4) | 481 passed in total, build succeeds |
-| 4–9 | Not started | | | | |
+| 3 | Done, approved; merged as `d38d807` | `feat/phase-03-parameter-estimation` | `bbcb668`, `ce0d85a`, `d05d9a6`, `ad113e0`, `c6e21cb`, `d1355de` | [#4](https://github.com/tekw1n/istatistik-analiz-platformu/pull/4) | 481 passed in total, build succeeds |
+| 4 | Done, awaiting user approval | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | [#5](https://github.com/tekw1n/istatistik-analiz-platformu/pull/5) | 515 passed, build succeeds |
+| 5–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
@@ -117,6 +118,9 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - The UI is only a Turkish placeholder page. Tailwind CSS, Recharts and KaTeX are added in the phases that first use them.
 - `regularizedGammaP/Q` are limited to shapes up to about 1e6 (see the `shortcut:` comment in `src/math/gamma.ts`).
 - Binomial supports n up to 1e6 (tails are summed term by term); Poisson and Gamma inherit the incomplete gamma limit.
+- The chi-square test allows at most 10,000 discrete classes (for example Binomial n above 9,999 is rejected).
+- A discrete tail closed as X ≥ k without any E < 5 merge does not set the approximate flag, although the exact-value MLE then differs slightly from the grouped MLE. The same holds for Discrete Uniform (non-regular min/max estimator). Raised with the user in the Phase 4 report.
+- Engine messages print numbers with a decimal point; Phase 6 should format them for Turkish.
 - `integrate` handles finite intervals only and can miss a feature narrower than 1/32 of the interval.
 
 ## Phase 1 decisions
@@ -144,11 +148,21 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - Grouped and censored MLE maximise Σ f ln P_i(θ) numerically (Nelder–Mead, `src/math/optimization.ts`); relative accuracy is about 1e-7, not machine precision. The m2 note applies to raw-data MLE and to MM, not to grouped MLE.
 - Grouped two-parameter MLE requires at least 3 occupied classes.
 - Open tails are supported for Poisson, Geometric and Binomial only.
-- `pValueApproximate` is true for MM (including midpoint-based), for raw-data / frequency-table MLE and for manual parameters marked as estimated; false for grouped and censored MLE and for external parameters. Merging classes after a censored discrete fit also makes it approximate: Phase 4 must set the flag then.
+- p-value flags: see Phase 4 decisions (they replace the Phase 3 behaviour).
 - Grouped MM uses class midpoints without Sheppard's correction and is unavailable when any class is open.
 
-## Next: Phase 4
+## Phase 4 decisions
 
-1. Class probabilities and expected frequencies (Σ E = N), including discrete tail closing.
-2. Merging for E < 5 with history, statistic, degrees of freedom, p-value, critical value, decision.
-3. Set `pValueApproximate` after merging where needed; end-to-end textbook tests.
+- `chiSquareTest(id, observations, model, { alpha })` accepts an MM or MLE estimation or the result of `manualParameters`. The status is `ok`, `impossible` or `insufficient-df`.
+- p-value flag: `pValueApproximate` (always) is set for MM, continuous raw-data MLE and manual parameters marked as estimated. `approximateIfMerged` is set for discrete value MLE and for grouped / censored MLE; the test turns the flag on only when a merge happens. External parameters are never flagged. (User decision; applied to grouped continuous MLE for the same reason.)
+- Discrete classes: one per integer from the support minimum (or lower observed value) to the support maximum, or to the largest observed value with an `X ≥ k` last class.
+- Continuous classes: the first and last class are opened to ±∞. Grouped MLE now uses the same opened classes (it used closed ends in Phase 3, which did not match the test).
+- Continuous raw data must be binned before the test (Phase 5).
+- A class with probability 0 and O > 0 gives `impossible` before any merging.
+- Rounding tolerance 1e-9 is used for `E < 5` and for equal neighbour E values.
+
+## Next: Phase 5
+
+1. Discrete frequency table, grouped continuous table and raw data entry, with validation.
+2. CSV upload, spreadsheet paste, Turkish decimal comma.
+3. Sturges classification for raw continuous data and verified sample problems.

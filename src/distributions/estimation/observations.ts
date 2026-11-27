@@ -1,5 +1,17 @@
 import { checkData, DISTRIBUTIONS, type DistributionId } from '../catalog';
-import type { EstimationOptions, Observations } from './types';
+import type { DataClass, EstimationOptions, Observations } from './types';
+
+/**
+ * Opens the first and last class to infinity so that the classes cover the whole support.
+ * Every observation is in the table, so the observed frequencies do not change.
+ */
+export function closeTails(classes: readonly DataClass[]): DataClass[] {
+  return classes.map((c, i) => ({
+    ...c,
+    lower: i === 0 ? -Infinity : c.lower,
+    upper: i === classes.length - 1 ? Infinity : c.upper,
+  }));
+}
 
 function requireData(condition: boolean, message: string): void {
   if (!condition) throw new RangeError(message);

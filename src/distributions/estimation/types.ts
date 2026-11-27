@@ -48,6 +48,8 @@ export type Estimation = { method: Method } & (
       estimatedCount: number;
       /** The χ² reference distribution holds only approximately for these estimates. */
       pValueApproximate: boolean;
+      /** It also becomes approximate when the test has to merge classes. */
+      approximateIfMerged: boolean;
     })
   | Extract<Fit, { available: false }>
 );

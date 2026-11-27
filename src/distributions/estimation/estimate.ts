@@ -4,7 +4,7 @@ import type { Distribution } from '../distributionTypes';
 import { groupedMaximumLikelihood } from './groupedLikelihood';
 import { maximumLikelihood } from './maximumLikelihood';
 import { momentEstimates } from './moments';
-import { validateObservations } from './observations';
+import { closeTails, validateObservations } from './observations';
 import {
   unavailable,
   type DataClass,
@@ -25,11 +25,17 @@ const OPEN_CLASS_MOMENTS =
 /** Discrete data with an open tail only keeps the class frequencies of the tail. */
 const OPEN_TAIL_MODELS: DistributionId[] = ['poisson', 'geometric', 'binomial'];
 
+/**
+ * 'always': estimated from something other than the class frequencies.
+ * 'ifMerged': maximum likelihood on the class frequencies, exact only while the classes stay as they are.
+ */
+type Approximation = 'always' | 'ifMerged';
+
 function finish(
   id: DistributionId,
   method: Method,
   fit: Fit,
-  pValueApproximate: boolean,
+  approximation: Approximation,
 ): Estimation {
   if (!fit.available) return { method, ...fit };
   return {
@@ -37,8 +43,9 @@ function finish(
     ...fit,
     // The binomial n is known.
     estimatedCount: DISTRIBUTIONS[id].parameters.length - (id === 'binomial' ? 1 : 0),
-    pValueApproximate,
-    notes: pValueApproximate ? [...fit.notes, APPROXIMATE_P_VALUE] : fit.notes,
+    pValueApproximate: approximation === 'always',
+    approximateIfMerged: approximation === 'ifMerged',
+    notes: approximation === 'always' ? [...fit.notes, APPROXIMATE_P_VALUE] : fit.notes,
   };
 }
 
@@ -64,8 +71,13 @@ export function estimateParameters(
       if (mm.available) mm = { ...mm, notes: [...mm.notes, MIDPOINTS] };
     }
     return {
-      mm: finish(id, 'mm', mm, true),
-      mle: finish(id, 'mle', groupedMaximumLikelihood(id, classes, options), false),
+      mm: finish(id, 'mm', mm, 'always'),
+      mle: finish(
+        id,
+        'mle',
+        groupedMaximumLikelihood(id, closeTails(classes), options),
+        'ifMerged',
+      ),
     };
   }
 
@@ -83,19 +95,20 @@ export function estimateParameters(
       ? groupedMaximumLikelihood(id, classes, options)
       : unavailable('Bu dağılım için açık uçlu sınıfla kestirim desteklenmiyor.');
     return {
-      mm: finish(id, 'mm', unavailable(OPEN_CLASS_MOMENTS), true),
-      mle: finish(id, 'mle', mle, false),
+      mm: finish(id, 'mm', unavailable(OPEN_CLASS_MOMENTS), 'always'),
+      mle: finish(id, 'mle', mle, 'ifMerged'),
     };
   }
 
   const statistics = describe(values, frequencies);
   return {
-    mm: finish(id, 'mm', momentEstimates(id, statistics, options), true),
+    mm: finish(id, 'mm', momentEstimates(id, statistics, options), 'always'),
+    // For a discrete distribution the exact values are the classes of the test.
     mle: finish(
       id,
       'mle',
       maximumLikelihood(id, values, frequencies, statistics, options),
-      true,
+      DISTRIBUTIONS[id].kind === 'discrete' ? 'ifMerged' : 'always',
     ),
   };
 }
@@ -116,6 +129,7 @@ export function manualParameters(
   params: number[];
   estimatedCount: number;
   pValueApproximate: boolean;
+  approximateIfMerged: boolean;
 } {
   const { name, parameters, create } = DISTRIBUTIONS[id];
   if (entries.length !== parameters.length) {
@@ -129,5 +143,6 @@ export function manualParameters(
     estimatedCount,
     // How the typed values were estimated is unknown.
     pValueApproximate: estimatedCount > 0,
+    approximateIfMerged: false,
   };
 }
