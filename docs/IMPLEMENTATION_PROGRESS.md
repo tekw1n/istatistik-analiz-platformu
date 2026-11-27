@@ -45,10 +45,11 @@ Merging preserves the totals of O, E and p.
 - When MM cannot be computed because of open-ended classes, the reason is shown.
 - A higher p-value is never presented as proof that a distribution is correct.
 
-## Open points
+## Resolved points (approved at the start of Phase 3)
 
-- Phase 3/4: the χ² reference distribution is exact only asymptotically and assumes parameters estimated from the class frequencies. With raw-data estimates (Chernoff–Lehmann) the p-value is approximate. Decide how to state this in the UI.
-- Phase 3: the specification gives no MM / MLE formulas for the discrete uniform distribution. Confirm them before implementation.
+- Discrete uniform: MLE â = min, b̂ = max. MM: h = (√(12·m2 + 1) − 1) / 2, a = x̄ − h, b = x̄ + h; the raw result is shown, the nearest integers are used in the test and the user is warned if they do not cover the data.
+- p-value: keep df = k' − 1 − m and show "p-value is approximate" (Chernoff–Lehmann) when parameters were estimated from observation values.
+- Normal and Log-Normal results show both σ̂ and σ̂², with a note that m2 (divisor N) is used.
 
 ## Technology and architecture
 
@@ -105,8 +106,9 @@ Rules:
 | Bootstrap | Done | `main` | `7f91b34` | — | — |
 | 0 | Done, approved; merged as `1cc734a` | `chore/phase-00-project-setup` | `50295a5` and the progress-record commit | [#1](https://github.com/tekw1n/istatistik-analiz-platformu/pull/1) | Not applicable, no code yet |
 | 1 | Done, approved; merged as `f579184` | `feat/phase-01-math-core` | `a0e512e`, `e0255d1`, `a6c88f2`, `b150115` | [#2](https://github.com/tekw1n/istatistik-analiz-platformu/pull/2) | 264 passed, build succeeds |
-| 2 | Done, awaiting user approval | `feat/phase-02-distributions` | `d84dfd5`, `8b914f1`, `4b7bc9b`, `9d0e249`, `30b2b8d` | [#3](https://github.com/tekw1n/istatistik-analiz-platformu/pull/3) | 426 passed in total, build succeeds |
-| 3–9 | Not started | | | | |
+| 2 | Done, approved; merged as `8c1afa7` | `feat/phase-02-distributions` | `d84dfd5`, `8b914f1`, `4b7bc9b`, `9d0e249`, `30b2b8d` | [#3](https://github.com/tekw1n/istatistik-analiz-platformu/pull/3) | 426 passed in total, build succeeds |
+| 3 | Done, awaiting user approval | `feat/phase-03-parameter-estimation` | `bbcb668`, `ce0d85a`, `d05d9a6`, `ad113e0`, `c6e21cb`, `d1355de` | [#4](https://github.com/tekw1n/istatistik-analiz-platformu/pull/4) | 481 passed in total, build succeeds |
+| 4–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
@@ -135,9 +137,18 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - `catalog.ts` holds Turkish names, parameter descriptions and `checkData` for data support.
 - Moments and MLE are not part of the distribution objects; they belong to Phase 3.
 
-## Next: Phase 3
+## Phase 3 decisions
 
-1. Confirm the discrete uniform MM / MLE formulas and how the Chernoff–Lehmann point is presented (see open points).
-2. Moments and maximum likelihood for raw data and frequency tables.
-3. Grouped-data MLE on class probabilities; explain why MM is unavailable for open classes.
-4. Manual parameter entry and the estimated parameter count m.
+- `estimateParameters(id, observations, options)` returns `{ mm, mle }`; an unavailable method carries a Turkish reason. `manualParameters` is mode B.
+- Observations are `values` (raw data or frequency table, optionally with a discrete open tail X ≥ k) or contiguous `classes` (grouped continuous).
+- Grouped and censored MLE maximise Σ f ln P_i(θ) numerically (Nelder–Mead, `src/math/optimization.ts`); relative accuracy is about 1e-7, not machine precision. The m2 note applies to raw-data MLE and to MM, not to grouped MLE.
+- Grouped two-parameter MLE requires at least 3 occupied classes.
+- Open tails are supported for Poisson, Geometric and Binomial only.
+- `pValueApproximate` is true for MM (including midpoint-based), for raw-data / frequency-table MLE and for manual parameters marked as estimated; false for grouped and censored MLE and for external parameters. Merging classes after a censored discrete fit also makes it approximate: Phase 4 must set the flag then.
+- Grouped MM uses class midpoints without Sheppard's correction and is unavailable when any class is open.
+
+## Next: Phase 4
+
+1. Class probabilities and expected frequencies (Σ E = N), including discrete tail closing.
+2. Merging for E < 5 with history, statistic, degrees of freedom, p-value, critical value, decision.
+3. Set `pValueApproximate` after merging where needed; end-to-end textbook tests.

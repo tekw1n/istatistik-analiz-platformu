@@ -1,5 +1,14 @@
+import { continuousUniform } from './continuous/continuousUniform';
+import { exponential } from './continuous/exponential';
+import { gammaDistribution } from './continuous/gammaDistribution';
+import { logNormal } from './continuous/logNormal';
+import { normal } from './continuous/normal';
 import { isInSupport } from './createDistribution';
-import type { GeometricDefinition } from './discrete/geometric';
+import { bernoulli } from './discrete/bernoulli';
+import { binomial } from './discrete/binomial';
+import { discreteUniform } from './discrete/discreteUniform';
+import { geometric, type GeometricDefinition } from './discrete/geometric';
+import { poisson } from './discrete/poisson';
 import type { Distribution, Support } from './distributionTypes';
 
 export type DistributionId =
@@ -33,6 +42,8 @@ export interface DistributionInfo {
   parameters: ParameterDescription[];
   /** Values an observation may take, whatever the parameter values are. */
   dataSupport(options: SupportOptions): Support;
+  /** `values` follow the order of `parameters`. Invalid values throw. */
+  create(values: readonly number[], options?: SupportOptions): Distribution;
 }
 
 const integers = (min: number, max = Infinity): Support => ({ min, max, integer: true });
@@ -52,12 +63,14 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
       { symbol: 'p', description: 'Başarı olasılığı' },
     ],
     dataSupport: ({ n }) => integers(0, n),
+    create: ([n, p]) => binomial(n!, p!),
   },
   poisson: {
     name: 'Poisson',
     kind: 'discrete',
     parameters: [{ symbol: 'λ', description: 'Birim başına ortalama olay sayısı' }],
     dataSupport: () => integers(0),
+    create: ([lambda]) => poisson(lambda!),
   },
   discreteUniform: {
     name: 'Kesikli Düzgün',
@@ -67,6 +80,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
       { symbol: 'b', description: 'En büyük değer' },
     ],
     dataSupport: () => integers(-Infinity),
+    create: ([a, b]) => discreteUniform(a!, b!),
   },
   geometric: {
     name: 'Geometrik',
@@ -74,12 +88,14 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     parameters: [{ symbol: 'p', description: 'Başarı olasılığı' }],
     dataSupport: ({ geometricDefinition }) =>
       integers(geometricDefinition === 'failures' ? 0 : 1),
+    create: ([p], options) => geometric(p!, options?.geometricDefinition),
   },
   bernoulli: {
     name: 'Bernoulli',
     kind: 'discrete',
     parameters: [{ symbol: 'p', description: 'Başarı olasılığı' }],
     dataSupport: () => integers(0, 1),
+    create: ([p]) => bernoulli(p!),
   },
   normal: {
     name: 'Normal',
@@ -89,12 +105,14 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
       { symbol: 'σ', description: 'Standart sapma' },
     ],
     dataSupport: () => reals(),
+    create: ([mu, sigma]) => normal(mu!, sigma!),
   },
   exponential: {
     name: 'Üstel',
     kind: 'continuous',
     parameters: [{ symbol: 'λ', description: 'Hız (ortalama = 1/λ)' }],
     dataSupport: () => reals(0),
+    create: ([lambda]) => exponential(lambda!),
   },
   continuousUniform: {
     name: 'Sürekli Düzgün',
@@ -104,6 +122,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
       { symbol: 'b', description: 'Üst sınır' },
     ],
     dataSupport: () => reals(),
+    create: ([a, b]) => continuousUniform(a!, b!),
   },
   gamma: {
     name: 'Gamma',
@@ -113,6 +132,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
       { symbol: 'θ', description: 'Ölçek (ortalama = αθ)' },
     ],
     dataSupport: () => reals(0, true),
+    create: ([alpha, theta]) => gammaDistribution(alpha!, theta!),
   },
   logNormal: {
     name: 'Log-Normal',
@@ -122,6 +142,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
       { symbol: 'σ', description: 'ln X değerlerinin standart sapması' },
     ],
     dataSupport: () => reals(0, true),
+    create: ([mu, sigma]) => logNormal(mu!, sigma!),
   },
 };
 
