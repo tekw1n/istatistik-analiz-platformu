@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { DISTRIBUTIONS } from '../../distributions/catalog';
 import type { Dataset } from '../data-entry/types';
+import type { CalculatorInput } from '../probability-calculator/ProbabilityCalculator';
 import { DistributionSelector } from '../parameter-estimation/DistributionSelector';
 import { GeometricDefinitionSelect, TrialsInput } from '../parameter-estimation/KnownValues';
 import { ParameterPanel } from '../parameter-estimation/ParameterPanel';
@@ -9,12 +10,16 @@ import {
   alphaFrom,
   estimate,
   incompatibility,
+  observationsFor,
   optionsFrom,
   selectModel,
   test,
   type Settings,
 } from './analysis';
 import { ChiSquareView } from './ChiSquareView';
+
+// The chart library is large, so it is loaded when an analysis is first shown.
+const Visuals = lazy(() => import('./Visuals'));
 
 interface Props {
   dataset: Dataset;
@@ -26,6 +31,7 @@ interface Props {
 export function SingleAnalysis({ dataset, settings, onChange }: Props) {
   const { distribution: id, n, geometricDefinition } = settings;
   const options = optionsFrom(settings);
+  const [calculator, setCalculator] = useState<CalculatorInput>({ type: 'atMost', a: '', b: '' });
   const unusable = id ? incompatibility(id, dataset, options) : null;
   // Estimation can be numerical, so it is not repeated when only the mode or α changes.
   const estimates = useMemo(
@@ -38,6 +44,7 @@ export function SingleAnalysis({ dataset, settings, onChange }: Props) {
   const result =
     id && model?.ok && alpha !== null ? test(id, dataset, model.value, alpha, options) : null;
   const problem = model?.ok === false ? model.reason : result?.ok === false ? result.reason : null;
+  const data = id ? observationsFor(id, dataset) : null;
 
   return (
     <div className="space-y-8">
@@ -75,6 +82,20 @@ export function SingleAnalysis({ dataset, settings, onChange }: Props) {
             )}
             {result?.ok && <ChiSquareView id={id} result={result.value} />}
           </section>
+
+          {model?.ok && data?.ok && (
+            <Suspense fallback={<p role="status">Grafikler yükleniyor…</p>}>
+              <Visuals
+                id={id}
+                model={model.value}
+                options={options}
+                testData={data.value.test}
+                result={result?.ok ? result.value : null}
+                calculator={calculator}
+                onCalculator={setCalculator}
+              />
+            </Suspense>
+          )}
         </>
       )}
     </div>

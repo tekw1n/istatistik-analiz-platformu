@@ -18,6 +18,9 @@
   --color-warning: #92400e;
   --color-warning-soft: #fffbeb;
   --color-success: #166534;
+  /* Chart series, validated for colour vision deficiencies on the surface colour. */
+  --color-observed: #2563eb;
+  --color-model: #ea580c;
 
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
   --font-mono: ui-monospace, 'Cascadia Mono', 'Fira Code', Menlo, Consolas, monospace;

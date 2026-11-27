@@ -9,8 +9,8 @@ export function Choices<T extends string>({
 }: {
   legend: string;
   options: readonly { value: T; label: string }[];
-  value: T;
-  onChange(value: T): void;
+  value: NoInfer<T>;
+  onChange: (value: NoInfer<T>) => void;
 }) {
   const name = useId();
   return (
