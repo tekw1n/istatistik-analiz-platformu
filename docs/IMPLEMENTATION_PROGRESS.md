@@ -111,8 +111,9 @@ Rules:
 | 4 | Done, approved; merged as `244c2e1` | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | [#5](https://github.com/tekw1n/istatistik-analiz-platformu/pull/5) | 515 passed, build succeeds |
 | 5 | Done, approved; merged as `0f30cbd` | `feat/phase-05-data-entry` | `4dcdba7`, `8f7f301`, `9435130`, `869fd75`, `d4f8549` | [#6](https://github.com/tekw1n/istatistik-analiz-platformu/pull/6) | 601 passed, build succeeds; manual browser smoke test (Chromium) |
 | 6 | Done, approved; merged as `3115206` | `feat/phase-06-analysis-ui` | `6f94ca2`, `3635657`, `84c2e23`, `4e60178` | [#7](https://github.com/tekw1n/istatistik-analiz-platformu/pull/7) | 650 passed, build succeeds; browser smoke test (Chromium) |
-| 7 | Done, awaiting user approval | `feat/phase-07-charts-calculator` | `405f2e1`, `b8ee413`, `41c136c` | [#8](https://github.com/tekw1n/istatistik-analiz-platformu/pull/8) | 677 passed, build succeeds; browser smoke test (Chromium) |
-| 8–9 | Not started | | | | |
+| 7 | Done, approved; merged as `e6d5567` | `feat/phase-07-charts-calculator` | `405f2e1`, `b8ee413`, `41c136c` | [#8](https://github.com/tekw1n/istatistik-analiz-platformu/pull/8) | 677 passed, build succeeds; browser smoke test (Chromium) |
+| 8 | Done, awaiting user approval | `feat/phase-08-reporting-design` | `7cfee42`, `949997a`, `7a36854`, `44f4256` | PR_LINK | 703 passed, build succeeds; keyboard, report and PDF smoke test (Chromium) |
+| 9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
@@ -121,7 +122,9 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - The main bundle is above 500 kB (mostly KaTeX); Vite warns about it. Charts load as a separate chunk.
 - Charts show at most 60 classes (frequency chart) or 300 values (discrete probability chart). Open classes have no histogram bar.
 - With grouped data the end classes are opened to ±∞, so a Continuous Uniform fit can leave the table bounds (a = −4,72 in the service time sample). By user decision the estimator is unchanged and a warning is shown.
-- Tables show at most 500 rows (totals cover all rows).
+- Tables show at most 500 rows, the report data table 200 (totals cover all rows).
+- Printing was verified with Chromium only; Firefox, Safari, a physical printer and a screen reader were not tried.
+- For grouped-data moment estimates the approximate p-value note speaks of observation values, although class midpoints were used (the midpoint note appears beside it).
 - There are no automated UI component tests; parsing, validation and samples are unit tested.
 - Raw data entries accept one variable of at most 100,000 values; CSV files up to 5 MB. Quoted fields spanning several lines are not supported.
 - `regularizedGammaP/Q` are limited to shapes up to about 1e6 (see the `shortcut:` comment in `src/math/gamma.ts`).
@@ -194,7 +197,15 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - Continuous data are shown as a density histogram f / (N·h) with the theoretical density. The density axis is clipped (with a note) when the curve is far taller than the histogram.
 - The calculator uses the parameter set selected for the test and always states P(X = a) = 0 for continuous distributions.
 
-## Next: Phase 8
+## Phase 8 decisions
 
-1. Print / PDF report with `@media print`.
-2. Responsive and accessibility pass, visual polish, error and empty states.
+- The report is a separate view (`features/reporting`) with fixed 680px charts so that they fit A4 portrait; `Ctrl+P` and the button print it. `.keep-together`, tables and figures avoid page breaks.
+- Calculator bounds default to the rounded distribution mean (b: about one standard deviation above) and reset with the distribution.
+- Keyboard: skip link, Enter / Shift+Enter between table cells, focus kept after adding or deleting rows, Home / End in tabs, focusable scroll areas, Escape closes the report.
+- Empty states and an error boundary explain what to do next.
+
+## Next: Phase 9
+
+1. Full test run and build, repository check.
+2. GitHub Pages and Vercel deployment documentation (Vite `base` for Pages).
+3. Check the completion criteria of the specification.
