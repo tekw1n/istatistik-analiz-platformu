@@ -102,3 +102,47 @@
     @apply text-right font-mono tabular-nums;
   }
 }
+
+@page {
+  size: A4 portrait;
+  margin: 12mm;
+}
+
+/* Printing and "save as PDF". The printable width of A4 portrait here is about 700px. */
+@media print {
+  html {
+    /* Every rem based size shrinks with it. */
+    font-size: 12px;
+  }
+  body {
+    background: white;
+  }
+  * {
+    /* Highlighted rows and legend swatches carry meaning. */
+    print-color-adjust: exact;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    display: none !important;
+  }
+  /* Kept on one page when they fit on one; longer tables break between rows. */
+  .keep-together,
+  .data-table,
+  .data-table tr,
+  figure {
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3,
+  caption,
+  summary,
+  figcaption {
+    break-after: avoid;
+  }
+  summary {
+    list-style: none;
+  }
+}

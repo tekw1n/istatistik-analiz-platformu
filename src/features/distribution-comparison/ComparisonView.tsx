@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { ScrollArea } from '../../components/ui/ScrollArea';
 import { DISTRIBUTIONS, type DistributionId } from '../../distributions/catalog';
 import type { Method } from '../../distributions/estimation/types';
 import { formatNumber } from '../../utils/format';
@@ -64,7 +65,7 @@ export function ComparisonView({
       {comparison && (
         <>
           {comparison.tested.length > 0 ? (
-            <div className="relative overflow-x-auto">
+            <ScrollArea label="Karşılaştırma tablosu">
               <table className="data-table tabular-nums">
                 <caption>Geçerli testler (p-değerine göre azalan)</caption>
                 <thead>
@@ -127,7 +128,7 @@ export function ComparisonView({
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollArea>
           ) : (
             <p className="text-sm">Bu veri ve ayarlarla geçerli test üreten dağılım yok.</p>
           )}

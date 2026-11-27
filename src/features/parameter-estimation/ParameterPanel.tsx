@@ -17,7 +17,7 @@ const MODES: { value: ParameterMode; label: string }[] = [
   { value: 'manual', label: 'Elle giriş' },
 ];
 
-function EstimationCard({
+export function EstimationCard({
   title,
   estimation,
   selected,
@@ -28,7 +28,7 @@ function EstimationCard({
 }) {
   return (
     <article
-      className={`min-w-0 rounded-md border p-4 ${selected ? 'border-2 border-primary' : 'border-line'}`}
+      className={`keep-together min-w-0 rounded-md border p-4 ${selected ? 'border-2 border-primary' : 'border-line'}`}
     >
       <h3 className="flex flex-wrap items-center gap-2">
         {title}
@@ -36,7 +36,7 @@ function EstimationCard({
       </h3>
       {estimation.available ? (
         <>
-          <div className="relative overflow-x-auto">
+          <div className="relative overflow-x-auto print:overflow-visible">
             <table className="data-table mt-2">
               <thead>
                 <tr>

@@ -1,5 +1,6 @@
 import { isSmall } from '../../chiSquare/merging';
 import type { ChiSquareClass, ChiSquareRow, MergeRule, MergeStep } from '../../chiSquare/types';
+import { ScrollArea } from '../../components/ui/ScrollArea';
 import type { Distribution } from '../../distributions/distributionTypes';
 import { formatNumber } from '../../utils/format';
 import { classLabel } from './classLabel';
@@ -40,7 +41,7 @@ export function ClassTable({
       : null;
   return (
     <div className="space-y-1">
-      <div className="relative max-h-[32rem] overflow-auto">
+      <ScrollArea label={caption}>
         <table className="data-table tabular-nums">
           <caption>{caption}</caption>
           <thead>
@@ -90,7 +91,7 @@ export function ClassTable({
             </tr>
           </tfoot>
         </table>
-      </div>
+      </ScrollArea>
       {rows.length > MAX_ROWS && (
         <p className="hint">
           İlk {MAX_ROWS} sınıf gösteriliyor; toplamlar bütün sınıfları kapsar.
@@ -103,9 +104,12 @@ export function ClassTable({
 export function MergeHistory({
   kind,
   history,
+  expanded = false,
 }: {
   kind: Distribution['kind'];
   history: MergeStep[];
+  /** Opens a long history too (printed report). */
+  expanded?: boolean;
 }) {
   const describe = (c: ChiSquareClass) => (
     <>
@@ -119,11 +123,11 @@ export function MergeHistory({
     return <p className="text-sm">Tüm sınıflarda Eᵢ ≥ 5; birleştirme yapılmadı.</p>;
   }
   return (
-    <details open={history.length <= 15}>
+    <details open={expanded || history.length <= 15}>
       <summary className="min-h-11 cursor-pointer py-2 font-semibold">
         Birleştirme geçmişi ({history.length} adım)
       </summary>
-      <div className="relative max-h-[32rem] overflow-auto">
+      <ScrollArea label="Birleştirme geçmişi">
         <table className="data-table tabular-nums">
           <thead>
             <tr>
@@ -146,7 +150,7 @@ export function MergeHistory({
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollArea>
       {history.length > MAX_ROWS && <p className="hint">İlk {MAX_ROWS} adım gösteriliyor.</p>}
     </details>
   );
