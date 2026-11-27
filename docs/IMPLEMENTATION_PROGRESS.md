@@ -104,8 +104,9 @@ Rules:
 |---|---|---|---|---|---|
 | Bootstrap | Done | `main` | `7f91b34` | — | — |
 | 0 | Done, approved; merged as `1cc734a` | `chore/phase-00-project-setup` | `50295a5` and the progress-record commit | [#1](https://github.com/tekw1n/istatistik-analiz-platformu/pull/1) | Not applicable, no code yet |
-| 1 | Done, awaiting user approval | `feat/phase-01-math-core` | `a0e512e`, `e0255d1`, `a6c88f2`, `b150115` | [#2](https://github.com/tekw1n/istatistik-analiz-platformu/pull/2) | 264 passed, build succeeds |
-| 2–9 | Not started | | | | |
+| 1 | Done, approved; merged as `f579184` | `feat/phase-01-math-core` | `a0e512e`, `e0255d1`, `a6c88f2`, `b150115` | [#2](https://github.com/tekw1n/istatistik-analiz-platformu/pull/2) | 264 passed, build succeeds |
+| 2 | Done, awaiting user approval | `feat/phase-02-distributions` | `d84dfd5`, `8b914f1`, `4b7bc9b`, `9d0e249`, `30b2b8d` | [#3](https://github.com/tekw1n/istatistik-analiz-platformu/pull/3) | 426 passed in total, build succeeds |
+| 3–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
@@ -113,6 +114,7 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 
 - The UI is only a Turkish placeholder page. Tailwind CSS, Recharts and KaTeX are added in the phases that first use them.
 - `regularizedGammaP/Q` are limited to shapes up to about 1e6 (see the `shortcut:` comment in `src/math/gamma.ts`).
+- Binomial supports n up to 1e6 (tails are summed term by term); Poisson and Gamma inherit the incomplete gamma limit.
 - `integrate` handles finite intervals only and can miss a feature narrower than 1/32 of the interval.
 
 ## Phase 1 decisions
@@ -123,8 +125,19 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - `describe` returns null for undefined statistics. CV and variance/mean ratio use s² (divisor N − 1) and are defined only for a positive mean.
 - Reference values come from `tests/math/generate_references.py` (mpmath, 40 digits), independent of the TypeScript code.
 
-## Next: Phase 2
+## Phase 2 decisions
 
-1. Define the common distribution interface (PMF/PDF, CDF, SF, interval probability, validation, support).
-2. Implement the five discrete and five continuous distributions on top of `src/math`.
-3. Test them against independent reference values.
+- Each distribution is a factory returning `cdf`, `sf` and `pmf` or `pdf`; invalid parameters throw a `RangeError` with a Turkish message.
+- `createDistribution.ts` clips every function to the support in one place. `intervalProbability(d, a, b)` is P(a ≤ X ≤ b), accepts infinite bounds and subtracts the tail that avoids cancellation.
+- Normal and Log-Normal take σ (standard deviation), not σ². Exponential takes the rate λ; Gamma takes shape α and scale θ.
+- Gamma and Log-Normal have the support x > 0; Exponential has x ≥ 0.
+- Geometric takes the definition `'trials'` (default) or `'failures'`. Bernoulli is separate from Binomial.
+- `catalog.ts` holds Turkish names, parameter descriptions and `checkData` for data support.
+- Moments and MLE are not part of the distribution objects; they belong to Phase 3.
+
+## Next: Phase 3
+
+1. Confirm the discrete uniform MM / MLE formulas and how the Chernoff–Lehmann point is presented (see open points).
+2. Moments and maximum likelihood for raw data and frequency tables.
+3. Grouped-data MLE on class probabilities; explain why MM is unavailable for open classes.
+4. Manual parameter entry and the estimated parameter count m.
