@@ -1,0 +1,70 @@
+{
+  "poissonCalls": {
+    "params": [
+      1.9503360125438531
+    ],
+    "total": 120,
+    "initialClassCount": 7,
+    "finalClassCount": 6,
+    "df": 4,
+    "statistic": 5.1548597677449735,
+    "criticalValue": 9.487729036781158,
+    "pValue": 0.2717737797544378,
+    "rejectNull": false
+  },
+  "binomialBulbs": {
+    "params": [
+      5.0,
+      0.112
+    ],
+    "total": 200,
+    "initialClassCount": 6,
+    "finalClassCount": 3,
+    "df": 1,
+    "statistic": 0.06124205615912694,
+    "criticalValue": 3.841458820694126,
+    "pValue": 0.804543481629352,
+    "rejectNull": false
+  },
+  "uniformDie": {
+    "params": [
+      1.0,
+      6.0
+    ],
+    "total": 120,
+    "initialClassCount": 6,
+    "finalClassCount": 6,
+    "df": 5,
+    "statistic": 5.0,
+    "criticalValue": 11.070497693516355,
+    "pValue": 0.41588018699550794,
+    "rejectNull": false
+  },
+  "exponentialService": {
+    "params": [
+      0.25541281188299536
+    ],
+    "total": 100,
+    "initialClassCount": 6,
+    "finalClassCount": 6,
+    "df": 4,
+    "statistic": 1.2965020576131687,
+    "criticalValue": 9.487729036781158,
+    "pValue": 0.8619687295381322,
+    "rejectNull": false
+  },
+  "normalScores": {
+    "params": [
+      65.125,
+      13.918849629189907
+    ],
+    "total": 80,
+    "initialClassCount": 7,
+    "finalClassCount": 5,
+    "df": 2,
+    "statistic": 0.3014009993194018,
+    "criticalValue": 5.991464547107982,
+    "pValue": 0.8601052619057741,
+    "rejectNull": false
+  }
+}

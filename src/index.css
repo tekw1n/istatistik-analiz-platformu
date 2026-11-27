@@ -1,0 +1,94 @@
+@import 'tailwindcss';
+
+/* Design tokens. Components use these names, never raw colour values. */
+@theme {
+  --color-page: #f8fafc;
+  --color-surface: #ffffff;
+  --color-muted: #eef2f7;
+  --color-ink: #0f172a;
+  --color-ink-soft: #475569;
+  --color-line: #cbd5e1;
+  /* Borders of form controls need 3:1 contrast against the surface. */
+  --color-control: #64748b;
+  --color-primary: #1e40af;
+  --color-primary-strong: #1e3a8a;
+  --color-primary-soft: #dbeafe;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fef2f2;
+  --color-warning: #92400e;
+  --color-warning-soft: #fffbeb;
+  --color-success: #166534;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'Fira Code', Menlo, Consolas, monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-page text-ink font-sans text-base leading-normal antialiased;
+  }
+  h1 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  h2 {
+    @apply text-lg font-semibold;
+  }
+  h3 {
+    @apply text-base font-semibold;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}
+
+/* A utility, so that the button variants below can @apply it. */
+@utility btn {
+  @apply inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md border px-4 text-sm font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@layer components {
+  .card {
+    @apply rounded-lg border border-line bg-surface p-4 sm:p-6;
+  }
+  .btn-primary {
+    @apply btn border-primary bg-primary text-white hover:bg-primary-strong;
+  }
+  .btn-secondary {
+    @apply btn border-control bg-surface text-ink hover:bg-muted;
+  }
+  .btn-quiet {
+    @apply btn border-transparent text-danger hover:bg-danger-soft;
+  }
+  .field {
+    @apply min-h-11 w-full rounded-md border border-control bg-surface px-3 text-base disabled:border-line disabled:bg-muted disabled:text-ink-soft aria-invalid:border-2 aria-invalid:border-danger;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium;
+  }
+  .hint {
+    @apply text-sm text-ink-soft;
+  }
+
+  /* Tables: ruled header and footer, numbers right aligned in tabular figures. */
+  .data-table {
+    @apply w-full border-collapse text-sm;
+  }
+  .data-table caption {
+    @apply pb-2 text-left font-semibold;
+  }
+  .data-table th {
+    @apply border-b-2 border-ink px-2 py-2 text-left align-bottom font-semibold;
+  }
+  .data-table td {
+    @apply border-b border-line px-2 py-1.5 align-top;
+  }
+  .data-table tfoot td {
+    @apply border-t-2 border-b-0 border-ink font-semibold;
+  }
+  .data-table input.field {
+    @apply px-2 sm:px-3;
+  }
+  .data-table .num {
+    @apply text-right font-mono tabular-nums;
+  }
+}

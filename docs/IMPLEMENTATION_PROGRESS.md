@@ -108,18 +108,22 @@ Rules:
 | 1 | Done, approved; merged as `f579184` | `feat/phase-01-math-core` | `a0e512e`, `e0255d1`, `a6c88f2`, `b150115` | [#2](https://github.com/tekw1n/istatistik-analiz-platformu/pull/2) | 264 passed, build succeeds |
 | 2 | Done, approved; merged as `8c1afa7` | `feat/phase-02-distributions` | `d84dfd5`, `8b914f1`, `4b7bc9b`, `9d0e249`, `30b2b8d` | [#3](https://github.com/tekw1n/istatistik-analiz-platformu/pull/3) | 426 passed in total, build succeeds |
 | 3 | Done, approved; merged as `d38d807` | `feat/phase-03-parameter-estimation` | `bbcb668`, `ce0d85a`, `d05d9a6`, `ad113e0`, `c6e21cb`, `d1355de` | [#4](https://github.com/tekw1n/istatistik-analiz-platformu/pull/4) | 481 passed in total, build succeeds |
-| 4 | Done, awaiting user approval | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | [#5](https://github.com/tekw1n/istatistik-analiz-platformu/pull/5) | 515 passed, build succeeds |
-| 5–9 | Not started | | | | |
+| 4 | Done, approved; merged as `244c2e1` | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | [#5](https://github.com/tekw1n/istatistik-analiz-platformu/pull/5) | 515 passed, build succeeds |
+| 5 | Done, awaiting user approval | `feat/phase-05-data-entry` | `4dcdba7`, `8f7f301`, `9435130`, `869fd75`, `d4f8549` | [#6](https://github.com/tekw1n/istatistik-analiz-platformu/pull/6) | 601 passed, build succeeds; manual browser smoke test (Chromium) |
+| 6–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
 ## Known bugs and gaps
 
-- The UI is only a Turkish placeholder page. Tailwind CSS, Recharts and KaTeX are added in the phases that first use them.
+- The UI covers data entry only. Recharts and KaTeX are added in the phases that first use them.
+- There are no automated UI component tests; parsing, validation and samples are unit tested.
+- Support checks that depend on the distribution (for example Binomial 0..n) run when a distribution is chosen (Phase 6).
+- Raw data entries accept one variable of at most 100,000 values; CSV files up to 5 MB. Quoted fields spanning several lines are not supported.
 - `regularizedGammaP/Q` are limited to shapes up to about 1e6 (see the `shortcut:` comment in `src/math/gamma.ts`).
 - Binomial supports n up to 1e6 (tails are summed term by term); Poisson and Gamma inherit the incomplete gamma limit.
 - The chi-square test allows at most 10,000 discrete classes (for example Binomial n above 9,999 is rejected).
-- A discrete tail closed as X ≥ k without any E < 5 merge does not set the approximate flag, although the exact-value MLE then differs slightly from the grouped MLE. The same holds for Discrete Uniform (non-regular min/max estimator). Raised with the user in the Phase 4 report.
+- By user decision, Poisson, Geometric and Discrete Uniform fits without an E < 5 merge are not flagged as approximate, although a tail closed as X ≥ k (or the non-regular min/max estimator) makes them slightly so.
 - Engine messages print numbers with a decimal point; Phase 6 should format them for Turkish.
 - `integrate` handles finite intervals only and can miss a feature narrower than 1/32 of the interval.
 
@@ -161,8 +165,18 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - A class with probability 0 and O > 0 gives `impossible` before any merging.
 - Rounding tolerance 1e-9 is used for `E < 5` and for equal neighbour E values.
 
-## Next: Phase 5
+## Phase 5 decisions
 
-1. Discrete frequency table, grouped continuous table and raw data entry, with validation.
-2. CSV upload, spreadsheet paste, Turkish decimal comma.
-3. Sturges classification for raw continuous data and verified sample problems.
+- Three tabs (frequency table, grouped table, raw data / CSV) produce a `Dataset`: `observations` for estimation and, for raw data, Sturges `classes` for testing continuous distributions.
+- Number format: tab, then semicolon, then comma decide the delimiter. In a comma-only text the comma is a decimal mark only if every token with a comma looks like one decimal number; the UI says so and offers an explicit Turkish / Standard choice.
+- Nothing is skipped silently: every non-numeric cell is reported. A CSV with a header and several columns requires choosing a column. Non UTF-8 files are read as Windows-1254.
+- Sturges classes are [a, b) with the last class closed; the width is rounded up to the data precision, so there can be fewer than k classes.
+- Design system: light theme, tokens in `src/index.css` (`@theme`), system fonts (no external requests), tabular figures for numbers, 44px controls.
+- Five samples (Poisson, Binomial, Discrete Uniform, Exponential, Normal); three of them show E < 5 merging. References come from `tests/data-entry/generate_sample_references.py`.
+
+## Next: Phase 6
+
+1. Preliminary analysis cards and distribution selection with support filtering.
+2. Parameter estimation screen (MM, MLE, manual), single analysis and automatic comparison.
+3. Raw and merged calculation tables, merge history, decision screen; format engine messages for Turkish.
+4. Preselect distribution, mode and α when a sample is loaded.
