@@ -1,3 +1,4 @@
+import { quantile, visibleRange } from '../../components/charts/chartData';
 import { intervalProbability, isInSupport } from '../../distributions/createDistribution';
 import type { Distribution } from '../../distributions/distributionTypes';
 import { formatNumber, texNumber } from '../../utils/format';
@@ -6,6 +7,30 @@ export type Query =
   | { type: 'point'; a: number }
   | { type: 'atMost'; a: number }
   | { type: 'between'; a: number; b: number };
+
+/** What the user chose in the calculator. A bound that is absent shows its default. */
+export interface CalculatorInput {
+  type: Query['type'];
+  a?: string;
+  b?: string;
+}
+
+/**
+ * Starting bounds that show a visible area at once: a is the rounded mean and
+ * b a rounded value about one standard deviation above it.
+ */
+export function defaultBounds(distribution: Distribution, mean: number): { a: number; b: number } {
+  let step = 1;
+  if (distribution.kind === 'continuous') {
+    const [lo, hi] = visibleRange(distribution);
+    step = 10 ** Math.floor(Math.log10((hi - lo) / 20));
+  }
+  // toPrecision removes the binary noise of the multiplication.
+  const round = (x: number) => Number((Math.round(x / step) * step).toPrecision(12));
+  const a = round(mean);
+  const upper = round(quantile(distribution, 0.84));
+  return { a, b: upper > a ? upper : Number((a + step).toPrecision(12)) };
+}
 
 export interface Answer {
   probability: number;

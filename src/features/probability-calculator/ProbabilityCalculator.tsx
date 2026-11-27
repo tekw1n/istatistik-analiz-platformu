@@ -5,19 +5,19 @@ import { DISTRIBUTIONS, type DistributionId } from '../../distributions/catalog'
 import type { Distribution } from '../../distributions/distributionTypes';
 import { formatNumber } from '../../utils/format';
 import { parseCell } from '../data-entry/numbers';
-import { calculate, type Answer, type Query } from './calculate';
+import {
+  calculate,
+  defaultBounds,
+  type Answer,
+  type CalculatorInput,
+  type Query,
+} from './calculate';
 
 const TYPES: { value: Query['type']; label: string }[] = [
   { value: 'point', label: 'P(X = a)' },
   { value: 'atMost', label: 'P(X ≤ a)' },
   { value: 'between', label: 'P(a ≤ X ≤ b)' },
 ];
-
-export interface CalculatorInput {
-  type: Query['type'];
-  a: string;
-  b: string;
-}
 
 /** Answers the query typed so far, or says what is missing. */
 function solve(
@@ -49,16 +49,22 @@ export function ProbabilityCalculator({
   id,
   distribution,
   params,
+  mean,
   value,
   onChange,
 }: {
   id: DistributionId;
   distribution: Distribution;
   params: readonly number[];
+  mean: number;
   value: CalculatorInput;
   onChange: (value: CalculatorInput) => void;
 }) {
-  const { type, a, b } = value;
+  const defaults = defaultBounds(distribution, mean);
+  const asText = (x: number) => String(x).replace('.', ',');
+  const { type } = value;
+  const a = value.a ?? asText(defaults.a);
+  const b = value.b ?? asText(defaults.b);
   const { name, parameters, kind } = DISTRIBUTIONS[id];
   const solution = solve(distribution, type, a, b);
   const answer = 'answer' in solution ? solution.answer : null;
