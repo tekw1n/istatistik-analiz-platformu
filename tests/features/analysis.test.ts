@@ -215,6 +215,46 @@ describe('comparison', () => {
   });
 });
 
+describe('continuous uniform on grouped data', () => {
+  const warned = (dataset: Dataset) => {
+    const result = estimate('continuousUniform', dataset, {});
+    if (!result.ok) throw new Error(result.reason);
+    return [result.value.mm, result.value.mle].map(
+      (e) => e.available && e.notes.some((n) => n.startsWith('Uyarı: kestirilen [a, b]')),
+    );
+  };
+  const table = (bounds: number[], frequencies: number[]): Dataset => {
+    const observations = {
+      type: 'classes' as const,
+      classes: frequencies.map((frequency, i) => ({
+        lower: bounds[i]!,
+        upper: bounds[i + 1]!,
+        frequency,
+      })),
+    };
+    return { source: 'grouped', observations, classes: observations };
+  };
+
+  it('warns when the fitted range leaves the table, without changing the estimate', () => {
+    const skewed = table([0, 2, 4, 6, 8, 10], [42, 20, 17, 8, 13]);
+    expect(warned(skewed)[1]).toBe(true);
+    const result = estimate('continuousUniform', skewed, {});
+    expect(result.ok && result.value.mle.available && result.value.mle.params[0]).toBeLessThan(0);
+    const c = compareDistributions(skewed, {}, 0.05);
+    const row = c.tested.find((r) => r.id === 'continuousUniform')!;
+    expect(row.warnings.join(' ')).toContain('tablonun sınıf sınırlarının dışına');
+  });
+
+  it('stays quiet for bounds on or inside the table edges', () => {
+    expect(warned(table([0, 1, 2, 3], [10, 10, 10]))).toEqual([false, false]);
+    expect(warned(table([0, 1, 2, 3], [5, 10, 5]))).toEqual([false, false]);
+  });
+
+  it('does not count open bounds as exceeded', () => {
+    expect(warned(table([-Infinity, 1, 2, Infinity], [10, 10, 10]))[1]).toBe(false);
+  });
+});
+
 describe('class labels', () => {
   const range = (lower: number, upper: number) => ({
     lower,

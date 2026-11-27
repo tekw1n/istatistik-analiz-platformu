@@ -110,16 +110,17 @@ Rules:
 | 3 | Done, approved; merged as `d38d807` | `feat/phase-03-parameter-estimation` | `bbcb668`, `ce0d85a`, `d05d9a6`, `ad113e0`, `c6e21cb`, `d1355de` | [#4](https://github.com/tekw1n/istatistik-analiz-platformu/pull/4) | 481 passed in total, build succeeds |
 | 4 | Done, approved; merged as `244c2e1` | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | [#5](https://github.com/tekw1n/istatistik-analiz-platformu/pull/5) | 515 passed, build succeeds |
 | 5 | Done, approved; merged as `0f30cbd` | `feat/phase-05-data-entry` | `4dcdba7`, `8f7f301`, `9435130`, `869fd75`, `d4f8549` | [#6](https://github.com/tekw1n/istatistik-analiz-platformu/pull/6) | 601 passed, build succeeds; manual browser smoke test (Chromium) |
-| 6 | Done, awaiting user approval | `feat/phase-06-analysis-ui` | `6f94ca2`, `3635657`, `84c2e23`, `4e60178` | [#7](https://github.com/tekw1n/istatistik-analiz-platformu/pull/7) | 650 passed, build succeeds; browser smoke test (Chromium) |
-| 7–9 | Not started | | | | |
+| 6 | Done, approved; merged as `3115206` | `feat/phase-06-analysis-ui` | `6f94ca2`, `3635657`, `84c2e23`, `4e60178` | [#7](https://github.com/tekw1n/istatistik-analiz-platformu/pull/7) | 650 passed, build succeeds; browser smoke test (Chromium) |
+| 7 | Done, awaiting user approval | `feat/phase-07-charts-calculator` | `405f2e1`, `b8ee413`, `41c136c` | [#8](https://github.com/tekw1n/istatistik-analiz-platformu/pull/8) | 677 passed, build succeeds; browser smoke test (Chromium) |
+| 8–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
 ## Known bugs and gaps
 
-- Charts and the probability calculator are not built yet (Recharts is added in Phase 7).
-- The production bundle is one chunk above 500 kB (KaTeX); Vite warns about it.
-- Open point: with grouped data the end classes are opened to ±∞, so a Continuous Uniform fit can give a negative lower bound even for non-negative data (for example a = −4,72 in the service time sample). Raised in the Phase 6 report.
+- The main bundle is above 500 kB (mostly KaTeX); Vite warns about it. Charts load as a separate chunk.
+- Charts show at most 60 classes (frequency chart) or 300 values (discrete probability chart). Open classes have no histogram bar.
+- With grouped data the end classes are opened to ±∞, so a Continuous Uniform fit can leave the table bounds (a = −4,72 in the service time sample). By user decision the estimator is unchanged and a warning is shown.
 - Tables show at most 500 rows (totals cover all rows).
 - There are no automated UI component tests; parsing, validation and samples are unit tested.
 - Raw data entries accept one variable of at most 100,000 values; CSV files up to 5 MB. Quoted fields spanning several lines are not supported.
@@ -186,7 +187,14 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - The raw table marks E < 5 rows with colour and text; only the final table totals to χ².
 - A formula bug from Phase 3 (a lost backslash printed ";" in two formulas) was found and fixed.
 
-## Next: Phase 7
+## Phase 7 decisions
 
-1. Observed / expected frequency charts and theoretical curves (Recharts).
-2. Interactive probability calculator: P(X = a), P(X ≤ a), P(a ≤ X ≤ b).
+- Chart data and probability calculations are pure modules (`components/charts/chartData.ts`, `features/probability-calculator/calculate.ts`).
+- Observed is `--color-observed`, the model `--color-model` (validated for colour vision deficiencies). Ticks are round numbers in Turkish notation; animations are off.
+- Continuous data are shown as a density histogram f / (N·h) with the theoretical density. The density axis is clipped (with a note) when the curve is far taller than the histogram.
+- The calculator uses the parameter set selected for the test and always states P(X = a) = 0 for continuous distributions.
+
+## Next: Phase 8
+
+1. Print / PDF report with `@media print`.
+2. Responsive and accessibility pass, visual polish, error and empty states.

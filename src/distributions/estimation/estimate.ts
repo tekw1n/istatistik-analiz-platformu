@@ -22,6 +22,22 @@ const MIDPOINTS =
 const OPEN_CLASS_MOMENTS =
   'Açık uçlu sınıfın orta noktası ve gözlem değerleri bilinmediğinden momentler (x̄, m₂) hesaplanamaz.';
 
+const BEYOND_TABLE =
+  'Uyarı: kestirilen [a, b] aralığı tablonun sınıf sınırlarının dışına taşıyor. Testte uç sınıflar ±∞ yönünde açıldığı için hesap, bu sınıflardaki gözlemlerin tablo sınırlarının ötesinde de olabileceğini varsayar; sonuç verinin doğal sınırlarıyla (örneğin sürenin negatif olamaması) bağdaşmayabilir.';
+
+/** Warns when a continuous uniform range leaves the closed bounds of a grouped table. */
+function warnBeyondTable(id: DistributionId, classes: readonly DataClass[], fit: Fit): Fit {
+  if (id !== 'continuousUniform' || !fit.available) return fit;
+  const first = classes[0]!.lower;
+  const last = classes[classes.length - 1]!.upper;
+  const [a, b] = fit.params;
+  // The numerical maximum may miss a class bound by rounding. An open bound is never exceeded.
+  const tolerance = 1e-6 * (b! - a!);
+  const outside = (Number.isFinite(first) && a! < first - tolerance) ||
+    (Number.isFinite(last) && b! > last + tolerance);
+  return outside ? { ...fit, notes: [...fit.notes, BEYOND_TABLE] } : fit;
+}
+
 /** Discrete data with an open tail only keeps the class frequencies of the tail. */
 const OPEN_TAIL_MODELS: DistributionId[] = ['poisson', 'geometric', 'binomial'];
 
@@ -71,11 +87,11 @@ export function estimateParameters(
       if (mm.available) mm = { ...mm, notes: [...mm.notes, MIDPOINTS] };
     }
     return {
-      mm: finish(id, 'mm', mm, 'always'),
+      mm: finish(id, 'mm', warnBeyondTable(id, classes, mm), 'always'),
       mle: finish(
         id,
         'mle',
-        groupedMaximumLikelihood(id, closeTails(classes), options),
+        warnBeyondTable(id, classes, groupedMaximumLikelihood(id, closeTails(classes), options)),
         'ifMerged',
       ),
     };

@@ -67,7 +67,12 @@ function EstimationCard({
           {estimation.notes.length > 0 && (
             <ul className="hint mt-2 list-disc pl-5">
               {estimation.notes.map((note) => (
-                <li key={note}>{note}</li>
+                <li
+                  key={note}
+                  className={note.startsWith('Uyarı:') ? 'font-semibold text-warning' : undefined}
+                >
+                  {note}
+                </li>
               ))}
             </ul>
           )}
