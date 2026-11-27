@@ -6,7 +6,7 @@ import { sigmaEstimates } from './moments';
 import { fitted, unavailable, type DataClass, type EstimationOptions, type Fit } from './types';
 
 const FORMULA =
-  '\\max_\\theta\; \\ell(\\theta)=\\sum_i f_i\\ln P_i(\\theta)';
+  '\\max_\\theta\\; \\ell(\\theta)=\\sum_i f_i\\ln P_i(\\theta)';
 const NOTE =
   'Sınıf olasılıkları üzerinden ℓ(θ) = Σ fᵢ ln Pᵢ(θ) sayısal olarak (Nelder–Mead) maksimize edildi; sınıf orta noktaları gözlem sayılmadı.';
 const NO_MAXIMUM = 'Sayısal en çok olabilirlik hesabı sonlu bir çözüme yakınsamadı.';
