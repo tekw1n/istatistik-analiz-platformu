@@ -1,6 +1,7 @@
 import type { DescriptiveStatistics } from '../../math/statistics';
 import type { DistributionId } from '../catalog';
 import { fitted, unavailable, type EstimationOptions, type Fit } from './types';
+import { formatNumber } from '../../utils/format';
 
 const NO_SPREAD = 'Gözlemlerin tümü aynı (m₂ = 0) olduğundan bu parametreler kestirilemez.';
 const M2_NOTE =
@@ -46,14 +47,14 @@ export function momentEstimates(
       const b = mean + half;
       const rounded = [Math.round(a), Math.round(b)];
       const notes = [
-        `Ham sonuç tam sayı olmayabilir; testte en yakın tam sayılar kullanılır: a = ${rounded[0]}, b = ${rounded[1]}.`,
+        `Ham sonuç tam sayı olmayabilir; testte en yakın tam sayılar kullanılır: a = ${formatNumber(rounded[0]!)}, b = ${formatNumber(rounded[1]!)}.`,
       ];
       if (rounded[0]! > min || rounded[1]! < max) {
         notes.push('Uyarı: yuvarlanan [a, b] aralığı verinin tamamını kapsamıyor.');
       }
       return fitted(
         [
-          { symbol: 'a', value: a, formula: '\\hat a=\\bar x-h,\; h=\\frac{\\sqrt{12m_2+1}-1}{2}' },
+          { symbol: 'a', value: a, formula: '\\hat a=\\bar x-h,\\; h=\\frac{\\sqrt{12m_2+1}-1}{2}' },
           { symbol: 'b', value: b, formula: '\\hat b=\\bar x+h' },
         ],
         rounded,

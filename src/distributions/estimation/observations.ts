@@ -1,5 +1,6 @@
 import { checkData, DISTRIBUTIONS, type DistributionId } from '../catalog';
 import type { DataClass, EstimationOptions, Observations } from './types';
+import { formatNumber } from '../../utils/format';
 
 /**
  * Opens the first and last class to infinity so that the classes cover the whole support.
@@ -50,7 +51,7 @@ export function validateObservations(
       );
       requireData(
         (c.lower === -Infinity || c.lower >= min) && c.upper > min,
-        `${name} dağılımının desteği ${min} değerinden başlar; sınıf sınırları bunun altında olamaz.`,
+        `${name} dağılımının desteği ${formatNumber(min)} değerinden başlar; sınıf sınırları bunun altında olamaz.`,
       );
     });
     requireData(classes.some((c) => c.frequency > 0), 'Toplam frekans sıfır olamaz.');

@@ -4,6 +4,7 @@ import type { Distribution } from '../distributions/distributionTypes';
 import { closeTails } from '../distributions/estimation/observations';
 import type { DataClass, Observations } from '../distributions/estimation/types';
 import type { ChiSquareClass } from './types';
+import { formatNumber } from '../utils/format';
 
 const MAX_CLASSES = 10_000;
 
@@ -32,7 +33,7 @@ function discreteClasses(
     : observed.reduce((a, b) => Math.max(a, b), Number.isFinite(max) ? max : first);
   if (last - first + 1 > MAX_CLASSES) {
     throw new RangeError(
-      `Test için ${MAX_CLASSES} sınıftan fazlası gerekiyor; verinin değer aralığı çok geniş.`,
+      `Test için ${formatNumber(MAX_CLASSES)} sınıftan fazlası gerekiyor; verinin değer aralığı çok geniş.`,
     );
   }
 

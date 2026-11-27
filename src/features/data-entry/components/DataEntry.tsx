@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState, type KeyboardEvent } from 'react';
-import { SAMPLES } from '../samples';
+import { useCallback, useEffect, useState } from 'react';
+import { TabPanel, Tabs } from '../../../components/ui/Tabs';
+import { SAMPLES, type Sample } from '../samples';
 import type { Dataset } from '../types';
 import { FrequencyForm } from './FrequencyForm';
 import { GroupedForm } from './GroupedForm';
@@ -14,8 +15,14 @@ const TABS = [
 
 type Source = Dataset['source'];
 
+interface Props {
+  onDataset(dataset: Dataset | null): void;
+  /** Lets the analysis preselect the distribution, mode and α of a loaded sample. */
+  onSample(sample: Sample): void;
+}
+
 /** The three input tabs. Each keeps its own entries; the active tab provides the dataset. */
-export function DataEntry({ onDataset }: { onDataset(dataset: Dataset | null): void }) {
+export function DataEntry({ onDataset, onSample }: Props) {
   const [active, setActive] = useState<Source>('frequency');
   const [datasets, setDatasets] = useState<Partial<Record<Source, Dataset | null>>>({});
   const [sampleId, setSampleId] = useState('');
@@ -47,16 +54,7 @@ export function DataEntry({ onDataset }: { onDataset(dataset: Dataset | null): v
     setLoaded((all) => ({ ...all, [source]: chosen.id }));
     setLoads((n) => ({ ...n, [source]: n[source] + 1 }));
     setActive(source);
-  };
-
-  const move = (event: KeyboardEvent) => {
-    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
-    if (!step) return;
-    event.preventDefault();
-    const index = TABS.findIndex((t) => t.id === active);
-    const next = TABS[(index + step + TABS.length) % TABS.length]!;
-    setActive(next.id);
-    document.getElementById(`tab-${next.id}`)?.focus();
+    onSample(chosen);
   };
 
   const frequencySample = sampleOf('frequency')?.entry;
@@ -91,45 +89,34 @@ export function DataEntry({ onDataset }: { onDataset(dataset: Dataset | null): v
       </div>
       <p className="hint">Örnek yüklemek ilgili sekmedeki tablonun yerine geçer.</p>
 
-      <div role="tablist" aria-label="Veri giriş yöntemi" className="flex flex-wrap border-b border-line">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            id={`tab-${tab.id}`}
-            type="button"
-            role="tab"
-            aria-selected={active === tab.id}
-            aria-controls={`panel-${tab.id}`}
-            tabIndex={active === tab.id ? 0 : -1}
-            className="min-h-11 cursor-pointer border-b-3 border-transparent px-4 text-sm font-medium text-ink-soft hover:text-ink aria-selected:border-primary aria-selected:text-primary"
-            onClick={() => setActive(tab.id)}
-            onKeyDown={move}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        label="Veri giriş yöntemi"
+        name="data"
+        tabs={TABS}
+        active={active}
+        onSelect={setActive}
+      />
 
       {sample && <SamplePanel sample={sample} />}
 
       {/* All panels stay mounted so that switching tabs does not lose entries. */}
-      <div role="tabpanel" id="panel-frequency" aria-labelledby="tab-frequency" hidden={active !== 'frequency'}>
+      <TabPanel name="data" id="frequency" active={active}>
         <FrequencyForm
           key={loads.frequency}
           initial={frequencySample?.source === 'frequency' ? frequencySample : undefined}
           onDataset={reporters.frequency}
         />
-      </div>
-      <div role="tabpanel" id="panel-grouped" aria-labelledby="tab-grouped" hidden={active !== 'grouped'}>
+      </TabPanel>
+      <TabPanel name="data" id="grouped" active={active}>
         <GroupedForm
           key={loads.grouped}
           initial={groupedSample?.source === 'grouped' ? groupedSample : undefined}
           onDataset={reporters.grouped}
         />
-      </div>
-      <div role="tabpanel" id="panel-raw" aria-labelledby="tab-raw" hidden={active !== 'raw'}>
+      </TabPanel>
+      <TabPanel name="data" id="raw" active={active}>
         <RawDataForm onDataset={reporters.raw} />
-      </div>
+      </TabPanel>
     </section>
   );
 }
