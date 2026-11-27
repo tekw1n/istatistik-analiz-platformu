@@ -5,7 +5,7 @@ import type { Estimation } from '../distributions/estimation/types';
  */
 export type FittedModel = Pick<
   Extract<Estimation, { available: true }>,
-  'params' | 'estimatedCount' | 'pValueApproximate' | 'approximateIfMerged'
+  'params' | 'estimatedCount' | 'pValueApproximate' | 'pValueNote' | 'approximateIfMerged'
 >;
 
 /**

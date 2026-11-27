@@ -12,8 +12,6 @@ import {
 import type { ChiSquareResult, FittedModel } from './types';
 import { formatNumber } from '../utils/format';
 
-const ESTIMATED_FROM_OBSERVATIONS =
-  'p-değeri yaklaşıktır: parametreler sınıf frekansları yerine gözlem değerlerinden kestirildi (Chernoff–Lehmann).';
 const MERGED_AFTER_ESTIMATION =
   'p-değeri yaklaşıktır: parametreler kestirildikten sonra E < 5 olan sınıflar birleştirildi.';
 const OPENED_TAILS =
@@ -73,7 +71,7 @@ export function chiSquareTest(
   const merged = mergeClasses(classes);
   const mergedRows = withContributions(merged.classes);
   const mergedAfterFit = model.approximateIfMerged && merged.history.length > 0;
-  if (model.pValueApproximate) notes.push(ESTIMATED_FROM_OBSERVATIONS);
+  if (model.pValueApproximate) notes.push(model.pValueNote ?? 'p-değeri yaklaşıktır.');
   else if (mergedAfterFit) notes.push(MERGED_AFTER_ESTIMATION);
 
   const common = {

@@ -15,8 +15,12 @@ import {
   type Observations,
 } from './types';
 
-const APPROXIMATE_P_VALUE =
+const FROM_OBSERVATIONS =
   'p-değeri yaklaşıktır: parametreler sınıf frekansları yerine gözlem değerlerinden kestirildi (Chernoff–Lehmann).';
+const FROM_MIDPOINTS =
+  'p-değeri yaklaşıktır: parametreler sınıf frekanslarından en çok olabilirlik yöntemiyle değil, sınıf orta noktalarından momentler metoduyla kestirildi.';
+const TYPED_BY_HAND =
+  'p-değeri yaklaşıktır: elle girilen parametreler veriden kestirildi olarak işaretlendi; kestirim yöntemi bilinmiyor.';
 const MIDPOINTS =
   'Sınıf orta noktaları kullanıldı; momentler ve kestirimler yaklaşıktır.';
 const OPEN_CLASS_MOMENTS =
@@ -42,10 +46,10 @@ function warnBeyondTable(id: DistributionId, classes: readonly DataClass[], fit:
 const OPEN_TAIL_MODELS: DistributionId[] = ['poisson', 'geometric', 'binomial'];
 
 /**
- * 'always': estimated from something other than the class frequencies.
+ * A note: estimated from something other than the class frequencies, so p is always approximate.
  * 'ifMerged': maximum likelihood on the class frequencies, exact only while the classes stay as they are.
  */
-type Approximation = 'always' | 'ifMerged';
+type Approximation = { note: string } | 'ifMerged';
 
 function finish(
   id: DistributionId,
@@ -54,14 +58,16 @@ function finish(
   approximation: Approximation,
 ): Estimation {
   if (!fit.available) return { method, ...fit };
+  const note = approximation === 'ifMerged' ? undefined : approximation.note;
   return {
     method,
     ...fit,
     // The binomial n is known.
     estimatedCount: DISTRIBUTIONS[id].parameters.length - (id === 'binomial' ? 1 : 0),
-    pValueApproximate: approximation === 'always',
+    pValueApproximate: note !== undefined,
+    pValueNote: note,
     approximateIfMerged: approximation === 'ifMerged',
-    notes: approximation === 'always' ? [...fit.notes, APPROXIMATE_P_VALUE] : fit.notes,
+    notes: note ? [...fit.notes, note] : fit.notes,
   };
 }
 
@@ -87,7 +93,7 @@ export function estimateParameters(
       if (mm.available) mm = { ...mm, notes: [...mm.notes, MIDPOINTS] };
     }
     return {
-      mm: finish(id, 'mm', warnBeyondTable(id, classes, mm), 'always'),
+      mm: finish(id, 'mm', warnBeyondTable(id, classes, mm), { note: FROM_MIDPOINTS }),
       mle: finish(
         id,
         'mle',
@@ -111,20 +117,20 @@ export function estimateParameters(
       ? groupedMaximumLikelihood(id, classes, options)
       : unavailable('Bu dağılım için açık uçlu sınıfla kestirim desteklenmiyor.');
     return {
-      mm: finish(id, 'mm', unavailable(OPEN_CLASS_MOMENTS), 'always'),
+      mm: finish(id, 'mm', unavailable(OPEN_CLASS_MOMENTS), { note: FROM_OBSERVATIONS }),
       mle: finish(id, 'mle', mle, 'ifMerged'),
     };
   }
 
   const statistics = describe(values, frequencies);
   return {
-    mm: finish(id, 'mm', momentEstimates(id, statistics, options), 'always'),
+    mm: finish(id, 'mm', momentEstimates(id, statistics, options), { note: FROM_OBSERVATIONS }),
     // For a discrete distribution the exact values are the classes of the test.
     mle: finish(
       id,
       'mle',
       maximumLikelihood(id, values, frequencies, statistics, options),
-      DISTRIBUTIONS[id].kind === 'discrete' ? 'ifMerged' : 'always',
+      DISTRIBUTIONS[id].kind === 'discrete' ? 'ifMerged' : { note: FROM_OBSERVATIONS },
     ),
   };
 }
@@ -145,6 +151,7 @@ export function manualParameters(
   params: number[];
   estimatedCount: number;
   pValueApproximate: boolean;
+  pValueNote?: string;
   approximateIfMerged: boolean;
 } {
   const { name, parameters, create } = DISTRIBUTIONS[id];
@@ -159,6 +166,7 @@ export function manualParameters(
     estimatedCount,
     // How the typed values were estimated is unknown.
     pValueApproximate: estimatedCount > 0,
+    pValueNote: estimatedCount > 0 ? TYPED_BY_HAND : undefined,
     approximateIfMerged: false,
   };
 }
