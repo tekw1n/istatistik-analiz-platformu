@@ -111,7 +111,7 @@ Rules:
 | 4 | Done, approved; merged as `244c2e1` | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | [#5](https://github.com/tekw1n/istatistik-analiz-platformu/pull/5) | 515 passed, build succeeds |
 | 5 | Done, approved; merged as `0f30cbd` | `feat/phase-05-data-entry` | `4dcdba7`, `8f7f301`, `9435130`, `869fd75`, `d4f8549` | [#6](https://github.com/tekw1n/istatistik-analiz-platformu/pull/6) | 601 passed, build succeeds; manual browser smoke test (Chromium) |
 | 6 | Done, approved; merged as `3115206` | `feat/phase-06-analysis-ui` | `6f94ca2`, `3635657`, `84c2e23`, `4e60178` | [#7](https://github.com/tekw1n/istatistik-analiz-platformu/pull/7) | 650 passed, build succeeds; browser smoke test (Chromium) |
-| 7 | Done, awaiting user approval | `feat/phase-07-charts-calculator` | `405f2e1`, `b8ee413`, `41c136c` | PR_LINK | 677 passed, build succeeds; browser smoke test (Chromium) |
+| 7 | Done, awaiting user approval | `feat/phase-07-charts-calculator` | `405f2e1`, `b8ee413`, `41c136c` | [#8](https://github.com/tekw1n/istatistik-analiz-platformu/pull/8) | 677 passed, build succeeds; browser smoke test (Chromium) |
 | 8–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
