@@ -1,6 +1,7 @@
 import { logGamma } from '../../math/gamma';
 import { discreteDistribution, requireParameter } from '../createDistribution';
 import type { DiscreteDistribution } from '../distributionTypes';
+import { formatNumber } from '../../utils/format';
 
 // shortcut: the tails are summed term by term, O(n) in the worst case;
 // use the regularized incomplete beta function if n above 1e6 is ever needed.
@@ -13,7 +14,7 @@ const times = (k: number, logP: number) => (k === 0 ? 0 : k * logP);
 export function binomial(n: number, p: number): DiscreteDistribution {
   requireParameter(
     Number.isInteger(n) && n >= 1 && n <= MAX_TRIALS,
-    `Binom: n, 1 ile ${MAX_TRIALS} arasında bir tam sayı olmalıdır.`,
+    `Binom: n, 1 ile ${formatNumber(MAX_TRIALS)} arasında bir tam sayı olmalıdır.`,
   );
   requireParameter(p >= 0 && p <= 1, 'Binom: p, 0 ile 1 arasında olmalıdır.');
 

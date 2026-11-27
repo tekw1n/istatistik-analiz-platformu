@@ -10,6 +10,7 @@ import { discreteUniform } from './discrete/discreteUniform';
 import { geometric, type GeometricDefinition } from './discrete/geometric';
 import { poisson } from './discrete/poisson';
 import type { Distribution, Support } from './distributionTypes';
+import { formatNumber } from '../utils/format';
 
 export type DistributionId =
   | 'binomial'
@@ -149,8 +150,9 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
 function describeSupport({ min, max, integer, minExclusive }: Support): string {
   const type = integer ? 'tam sayı' : 'gerçel sayı';
   if (min === -Infinity) return `herhangi bir ${type}`;
-  if (max !== Infinity) return `${min} ile ${max} arasında ${type}`;
-  return minExclusive ? `${min} değerinden büyük ${type}` : `en az ${min} olan ${type}`;
+  if (max !== Infinity) return `${formatNumber(min)} ile ${formatNumber(max)} arasında ${type}`;
+  const bound = formatNumber(min);
+  return minExclusive ? `${bound} değerinden büyük ${type}` : `en az ${bound} olan ${type}`;
 }
 
 /**
@@ -166,5 +168,5 @@ export function checkData(
   const support = dataSupport(options);
   const invalid = values.find((value) => !isInSupport(support, value));
   if (invalid === undefined) return null;
-  return `${name} dağılımı bu veriye uygulanamaz: her gözlem ${describeSupport(support)} olmalıdır, ancak veride ${invalid} değeri var.`;
+  return `${name} dağılımı bu veriye uygulanamaz: her gözlem ${describeSupport(support)} olmalıdır, ancak veride ${formatNumber(invalid)} değeri var.`;
 }

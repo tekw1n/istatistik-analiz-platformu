@@ -2,6 +2,7 @@ import type { Observations } from '../../distributions/estimation/types';
 import { parseCell } from './numbers';
 import { headerOf, parseText } from './parseText';
 import type { CellError } from './types';
+import { formatNumber } from '../../utils/format';
 
 export interface FrequencyRow {
   x: string;
@@ -59,7 +60,7 @@ export function readFrequencyTable(
       });
     } else {
       if (previous !== null && value === previous) {
-        errors.push({ row, field: 'x', message: `${value} değeri tekrar ediyor.` });
+        errors.push({ row, field: 'x', message: `${formatNumber(value)} değeri tekrar ediyor.` });
       } else if (previous !== null && value < previous) {
         errors.push({ row, field: 'x', message: 'x değerleri küçükten büyüğe sıralanmalıdır.' });
       } else if (previous !== null && value > previous + 1) {
@@ -158,8 +159,8 @@ export function readClassTable(
         field: 'lower',
         message:
           lower > previousUpper
-            ? `Önceki sınıfla arada boşluk var; alt sınır ${previousUpper} olmalıdır.`
-            : `Önceki sınıfla çakışıyor; alt sınır ${previousUpper} olmalıdır.`,
+            ? `Önceki sınıfla arada boşluk var; alt sınır ${formatNumber(previousUpper)} olmalıdır.`
+            : `Önceki sınıfla çakışıyor; alt sınır ${formatNumber(previousUpper)} olmalıdır.`,
       });
     }
     previousUpper = upper;

@@ -10,6 +10,7 @@ import {
   withContributions,
 } from './statistic';
 import type { ChiSquareResult, FittedModel } from './types';
+import { formatNumber } from '../utils/format';
 
 const ESTIMATED_FROM_OBSERVATIONS =
   'p-değeri yaklaşıktır: parametreler sınıf frekansları yerine gözlem değerlerinden kestirildi (Chernoff–Lehmann).';
@@ -57,7 +58,7 @@ export function chiSquareTest(
   if (impossible) {
     return {
       status: 'impossible',
-      reason: `Model, ${impossible.observed} gözlemin bulunduğu bir sınıfa sıfır (veya sayısal olarak sıfırdan ayırt edilemeyen) olasılık veriyor; gözlenen veri bu modele göre imkânsızdır ve test istatistiği hesaplanamaz.`,
+      reason: `Model, ${formatNumber(impossible.observed)} gözlemin bulunduğu bir sınıfa sıfır (veya sayısal olarak sıfırdan ayırt edilemeyen) olasılık veriyor; gözlenen veri bu modele göre imkânsızdır ve test istatistiği hesaplanamaz.`,
       total,
       alpha,
       rawRows,
@@ -110,7 +111,7 @@ export function chiSquareTest(
     criticalValue: chiSquareCriticalValue(df, alpha),
     rejectNull,
     conclusion: rejectNull
-      ? `p < α olduğundan H₀ reddedilir: verinin ${name} dağılımına uygun olduğu varsayımı α = ${alpha} düzeyinde desteklenmiyor.`
-      : `p ≥ α olduğundan H₀ reddedilemez: α = ${alpha} düzeyinde ${name} dağılımına uyumsuzluk için yeterli kanıt yoktur. Bu sonuç dağılımın doğru olduğunu kanıtlamaz.`,
+      ? `p < α olduğundan H₀ reddedilir: verinin ${name} dağılımına uygun olduğu varsayımı α = ${formatNumber(alpha)} düzeyinde desteklenmiyor.`
+      : `p ≥ α olduğundan H₀ reddedilemez: α = ${formatNumber(alpha)} düzeyinde ${name} dağılımına uyumsuzluk için yeterli kanıt yoktur. Bu sonuç dağılımın doğru olduğunu kanıtlamaz.`,
   };
 }
