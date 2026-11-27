@@ -4,7 +4,8 @@ export const MINIMUM_EXPECTED = 5;
 // Rounding must not turn an exact 5 into "below 5", or break a tie between equal E values.
 const ROUNDING = 1e-9;
 
-const isSmall = (c: ChiSquareClass) => c.expected < MINIMUM_EXPECTED - ROUNDING;
+/** Whether E < 5, so that the class has to be merged. */
+export const isSmall = (c: ChiSquareClass) => c.expected < MINIMUM_EXPECTED - ROUNDING;
 
 function combine(a: ChiSquareClass, b: ChiSquareClass): ChiSquareClass {
   return {
