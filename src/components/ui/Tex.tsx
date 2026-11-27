@@ -7,7 +7,7 @@ export function Tex({ math, display = false }: { math: string; display?: boolean
   return (
     <span
       // Long formulas scroll inside their own box instead of widening the page.
-      className={display ? 'block max-w-full overflow-x-auto overflow-y-hidden' : undefined}
+      className={display ? 'block max-w-full overflow-x-auto overflow-y-hidden print:overflow-visible' : undefined}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

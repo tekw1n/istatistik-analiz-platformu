@@ -1,6 +1,11 @@
 import { DISTRIBUTIONS, type DistributionId } from '../../distributions/catalog';
 import type { Dataset } from '../data-entry/types';
-import { incompatibility, optionsFrom, type Settings } from '../goodness-of-fit/analysis';
+import {
+  incompatibility,
+  INITIAL_SETTINGS,
+  optionsFrom,
+  type Settings,
+} from '../goodness-of-fit/analysis';
 
 const GROUPS = [
   { kind: 'discrete', title: 'Kesikli dağılımlar' },
@@ -39,8 +44,15 @@ export function DistributionSelector({
                     className="mt-0.5 size-4 accent-primary"
                     checked={settings.distribution === id}
                     disabled={reason !== null}
-                    // Manual values belong to the previous distribution.
-                    onChange={() => onChange({ ...settings, distribution: id, manual: [] })}
+                    // Manual values and calculator bounds belong to the previous distribution.
+                    onChange={() =>
+                      onChange({
+                        ...settings,
+                        distribution: id,
+                        manual: [],
+                        calculator: INITIAL_SETTINGS.calculator,
+                      })
+                    }
                   />
                   <span>
                     <span className="font-semibold">{DISTRIBUTIONS[id].name}</span>

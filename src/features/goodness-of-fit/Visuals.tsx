@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import type { ChiSquareResult, FittedModel } from '../../chiSquare/types';
-import { DensityChart } from '../../components/charts/DensityChart';
-import { FrequencyChart, MAX_CLASSES } from '../../components/charts/FrequencyChart';
 import { Choices } from '../../components/ui/Choices';
 import { DISTRIBUTIONS, type DistributionId } from '../../distributions/catalog';
 import type { EstimationOptions, Observations } from '../../distributions/estimation/types';
-import {
-  ProbabilityCalculator,
-  type CalculatorInput,
-} from '../probability-calculator/ProbabilityCalculator';
+import type { CalculatorInput } from '../probability-calculator/calculate';
+import { ProbabilityCalculator } from '../probability-calculator/ProbabilityCalculator';
+import { DensitySection, FrequencySection } from './Charts';
 
 type TableChoice = 'raw' | 'merged';
 
@@ -31,7 +28,7 @@ export default function Visuals({
   onCalculator: (value: CalculatorInput) => void;
 }) {
   const [table, setTable] = useState<TableChoice>('raw');
-  const { name, create } = DISTRIBUTIONS[id];
+  const { name, create, mean } = DISTRIBUTIONS[id];
   // The binomial n of the model replaces the known n.
   const distribution = create(model.params, options);
 
@@ -39,7 +36,7 @@ export default function Visuals({
   const rows = result && (table === 'merged' && hasMerged ? result.mergedRows : result.rawRows);
 
   return (
-    <>
+    <div className="space-y-8">
       <section className="space-y-5" aria-labelledby="charts-title">
         <h2 id="charts-title">6. Grafikler</h2>
         {rows ? (
@@ -55,21 +52,12 @@ export default function Visuals({
                 onChange={setTable}
               />
             )}
-            {rows.length > MAX_CLASSES ? (
-              <p className="hint">
-                {rows.length} sınıf bir grafikte okunamaz (en fazla {MAX_CLASSES}); hesap
-                tablolarını kullanın.
-              </p>
-            ) : (
-              <FrequencyChart kind={distribution.kind} rows={rows} />
-            )}
+            <FrequencySection kind={distribution.kind} rows={rows} />
           </>
         ) : (
           <p className="hint">Frekans grafiği için geçerli bir test ayarı gerekir.</p>
         )}
-        {distribution.kind === 'continuous' && testData.type === 'classes' && (
-          <DensityChart name={name} distribution={distribution} classes={testData.classes} />
-        )}
+        <DensitySection name={name} distribution={distribution} testData={testData} />
       </section>
 
       <section className="space-y-3" aria-labelledby="calculator-title">
@@ -78,10 +66,11 @@ export default function Visuals({
           id={id}
           distribution={distribution}
           params={model.params}
+          mean={mean(model.params, options)}
           value={calculator}
           onChange={onCalculator}
         />
       </section>
-    </>
+    </div>
   );
 }

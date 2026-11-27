@@ -1,10 +1,18 @@
+import { useId } from 'react';
 import { formatNumber } from '../../utils/format';
 import type { Dataset } from '../data-entry/types';
 import { distributionHints, summarize } from './summary';
 
 const show = (value: number | null) => (value === null ? 'Tanımsız' : formatNumber(value, 4));
 
-export function PreliminaryAnalysis({ dataset }: { dataset: Dataset }) {
+export function PreliminaryAnalysis({
+  dataset,
+  title = '2. Ön analiz',
+}: {
+  dataset: Dataset;
+  title?: string;
+}) {
+  const titleId = useId();
   const summary = summarize(dataset);
   const hints = distributionHints(dataset, summary);
   const s = summary.ok ? summary.statistics : null;
@@ -23,8 +31,8 @@ export function PreliminaryAnalysis({ dataset }: { dataset: Dataset }) {
     : [['Gözlem sayısı N', formatNumber(summary.ok ? 0 : summary.n)]];
 
   return (
-    <section className="card space-y-4" aria-labelledby="preliminary-title">
-      <h2 id="preliminary-title">2. Ön analiz</h2>
+    <section className="card space-y-4" aria-labelledby={titleId}>
+      <h2 id={titleId}>{title}</h2>
       {summary.ok && summary.approximate && (
         <p className="rounded-md border-l-4 border-warning bg-warning-soft p-3 text-sm text-warning">
           Değerler sınıf orta noktalarından hesaplanmıştır ve <strong>yaklaşıktır</strong>.
@@ -32,7 +40,7 @@ export function PreliminaryAnalysis({ dataset }: { dataset: Dataset }) {
       )}
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {cards.map(([term, value]) => (
-          <div key={term} className="rounded-md border border-line p-3">
+          <div key={term} className="keep-together rounded-md border border-line p-3">
             <dt className="hint">{term}</dt>
             <dd className="font-mono text-lg font-semibold tabular-nums">{value}</dd>
           </div>

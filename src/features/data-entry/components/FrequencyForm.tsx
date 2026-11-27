@@ -53,35 +53,40 @@ export function FrequencyForm({ initial, onDataset }: Props) {
           else change([...rows.slice(0, row), ...pasted.rows]);
         }}
         total={result.total}
+        toolbar={
+          <>
+            <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+              <input
+                type="checkbox"
+                className="size-5 accent-primary"
+                checked={openLast}
+                onChange={(e) => setOpenLast(e.target.checked)}
+              />
+              <span>
+                Son satır açık uçlu sınıftır (X ≥ x<sub>k</sub>)
+              </span>
+            </label>
+            <button
+              type="button"
+              className="btn-secondary"
+              disabled={!result.warnings.length}
+              onClick={() => change(fillMissingCategories(rows))}
+            >
+              Eksik değerleri 0 frekansla tamamla
+            </button>
+            {rows.length > 1 &&
+              result.errors.some((e) => e.message.includes('sıralanmalıdır')) && (
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => change(sortRows(rows))}
+                >
+                  Satırları sırala
+                </button>
+              )}
+          </>
+        }
       />
-      <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
-        <input
-          type="checkbox"
-          className="size-5 accent-primary"
-          checked={openLast}
-          onChange={(e) => setOpenLast(e.target.checked)}
-        />
-        <span>
-          Son satır açık uçlu sınıftır (X ≥ x<sub>k</sub>)
-        </span>
-      </label>
-      <button
-        type="button"
-        className="btn-secondary"
-        disabled={!result.warnings.length}
-        onClick={() => change(fillMissingCategories(rows))}
-      >
-        Eksik değerleri 0 frekansla tamamla
-      </button>
-      {rows.length > 1 && result.errors.some((e) => e.message.includes('sıralanmalıdır')) && (
-        <button
-          type="button"
-          className="btn-secondary ml-2"
-          onClick={() => change(sortRows(rows))}
-        >
-          Satırları sırala
-        </button>
-      )}
       <Messages
         kind="error"
         items={[...(pasteError ? [pasteError] : []), ...(touched ? result.problems : [])]}

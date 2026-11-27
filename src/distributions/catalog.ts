@@ -45,6 +45,8 @@ export interface DistributionInfo {
   dataSupport(options: SupportOptions): Support;
   /** `values` follow the order of `parameters`. Invalid values throw. */
   create(values: readonly number[], options?: SupportOptions): Distribution;
+  /** E(X) for valid parameter values. */
+  mean(values: readonly number[], options?: SupportOptions): number;
 }
 
 const integers = (min: number, max = Infinity): Support => ({ min, max, integer: true });
@@ -65,6 +67,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     ],
     dataSupport: ({ n }) => integers(0, n),
     create: ([n, p]) => binomial(n!, p!),
+    mean: ([n, p]) => n! * p!,
   },
   poisson: {
     name: 'Poisson',
@@ -72,6 +75,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     parameters: [{ symbol: 'λ', description: 'Birim başına ortalama olay sayısı' }],
     dataSupport: () => integers(0),
     create: ([lambda]) => poisson(lambda!),
+    mean: ([lambda]) => lambda!,
   },
   discreteUniform: {
     name: 'Kesikli Düzgün',
@@ -82,6 +86,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     ],
     dataSupport: () => integers(-Infinity),
     create: ([a, b]) => discreteUniform(a!, b!),
+    mean: ([a, b]) => (a! + b!) / 2,
   },
   geometric: {
     name: 'Geometrik',
@@ -90,6 +95,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     dataSupport: ({ geometricDefinition }) =>
       integers(geometricDefinition === 'failures' ? 0 : 1),
     create: ([p], options) => geometric(p!, options?.geometricDefinition),
+    mean: ([p], options) => 1 / p! - (options?.geometricDefinition === 'failures' ? 1 : 0),
   },
   bernoulli: {
     name: 'Bernoulli',
@@ -97,6 +103,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     parameters: [{ symbol: 'p', description: 'Başarı olasılığı' }],
     dataSupport: () => integers(0, 1),
     create: ([p]) => bernoulli(p!),
+    mean: ([p]) => p!,
   },
   normal: {
     name: 'Normal',
@@ -107,6 +114,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     ],
     dataSupport: () => reals(),
     create: ([mu, sigma]) => normal(mu!, sigma!),
+    mean: ([mu]) => mu!,
   },
   exponential: {
     name: 'Üstel',
@@ -114,6 +122,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     parameters: [{ symbol: 'λ', description: 'Hız (ortalama = 1/λ)' }],
     dataSupport: () => reals(0),
     create: ([lambda]) => exponential(lambda!),
+    mean: ([lambda]) => 1 / lambda!,
   },
   continuousUniform: {
     name: 'Sürekli Düzgün',
@@ -124,6 +133,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     ],
     dataSupport: () => reals(),
     create: ([a, b]) => continuousUniform(a!, b!),
+    mean: ([a, b]) => (a! + b!) / 2,
   },
   gamma: {
     name: 'Gamma',
@@ -134,6 +144,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     ],
     dataSupport: () => reals(0, true),
     create: ([alpha, theta]) => gammaDistribution(alpha!, theta!),
+    mean: ([alpha, theta]) => alpha! * theta!,
   },
   logNormal: {
     name: 'Log-Normal',
@@ -144,6 +155,7 @@ export const DISTRIBUTIONS: Record<DistributionId, DistributionInfo> = {
     ],
     dataSupport: () => reals(0, true),
     create: ([mu, sigma]) => logNormal(mu!, sigma!),
+    mean: ([mu, sigma]) => Math.exp(mu! + sigma! ** 2 / 2),
   },
 };
 

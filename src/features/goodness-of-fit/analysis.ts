@@ -13,6 +13,7 @@ import type {
 import { parseCell } from '../data-entry/numbers';
 import type { Sample } from '../data-entry/samples';
 import type { Dataset } from '../data-entry/types';
+import type { CalculatorInput } from '../probability-calculator/calculate';
 
 export type ParameterMode = Method | 'manual';
 
@@ -34,6 +35,8 @@ export interface Settings {
   /** Significance level, as typed. */
   alpha: string;
   customAlpha: boolean;
+  /** Probability calculator; reset together with the distribution. */
+  calculator: CalculatorInput;
 }
 
 export const INITIAL_SETTINGS: Settings = {
@@ -44,6 +47,7 @@ export const INITIAL_SETTINGS: Settings = {
   manual: [],
   alpha: '0,05',
   customAlpha: false,
+  calculator: { type: 'atMost' },
 };
 
 const asText = (value: number) => String(value).replace('.', ',');

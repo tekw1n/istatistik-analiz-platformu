@@ -36,7 +36,7 @@ function Equations({ result }: { result: Exclude<ChiSquareResult, { status: 'imp
     );
   }
   return (
-    <div className="space-y-1">
+    <div className="keep-together space-y-1">
       {lines.map((line) => (
         <Tex key={line} math={line} display />
       ))}
@@ -59,7 +59,7 @@ function Decision({ result }: { result: Extract<ChiSquareResult, { status: 'ok' 
     <div className="space-y-3">
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {facts.map(([term, value]) => (
-          <div key={term} className="rounded-md border border-line p-3">
+          <div key={term} className="keep-together rounded-md border border-line p-3">
             <dt className="hint">{term}</dt>
             <dd className="font-mono text-lg font-semibold tabular-nums">{value}</dd>
           </div>
@@ -67,7 +67,7 @@ function Decision({ result }: { result: Extract<ChiSquareResult, { status: 'ok' 
       </dl>
       <div
         role="status"
-        className={`rounded-md border-2 p-4 ${result.rejectNull ? 'border-danger bg-danger-soft' : 'border-primary bg-primary-soft'}`}
+        className={`keep-together rounded-md border-2 p-4 ${result.rejectNull ? 'border-danger bg-danger-soft' : 'border-primary bg-primary-soft'}`}
       >
         <p className="text-lg font-semibold">
           Karar: H₀ {result.rejectNull ? 'reddedilir' : 'reddedilemez'}
@@ -81,7 +81,16 @@ function Decision({ result }: { result: Extract<ChiSquareResult, { status: 'ok' 
   );
 }
 
-export function ChiSquareView({ id, result }: { id: DistributionId; result: ChiSquareResult }) {
+export function ChiSquareView({
+  id,
+  result,
+  expanded,
+}: {
+  id: DistributionId;
+  result: ChiSquareResult;
+  /** Shows the whole merge history. */
+  expanded?: boolean;
+}) {
   const { name, kind } = DISTRIBUTIONS[id];
   return (
     <div className="space-y-5">
@@ -104,7 +113,7 @@ export function ChiSquareView({ id, result }: { id: DistributionId; result: ChiS
       />
       {result.status !== 'impossible' && (
         <>
-          <MergeHistory kind={kind} history={result.history} />
+          <MergeHistory kind={kind} history={result.history} expanded={expanded} />
           <ClassTable
             caption="Nihai tablo (birleştirme sonrası)"
             kind={kind}

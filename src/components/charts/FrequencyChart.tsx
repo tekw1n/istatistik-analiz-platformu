@@ -12,9 +12,14 @@ export const MAX_CLASSES = 60;
 export function FrequencyChart({
   kind,
   rows,
+  width = '100%',
+  title = 'Gözlenen ve beklenen frekanslar',
 }: {
+  title?: string;
   kind: Distribution['kind'];
   rows: ChiSquareRow[];
+  /** A fixed pixel width for printing; the chart follows its container otherwise. */
+  width?: number | '100%';
 }) {
   const data = rows.map((row) => ({
     label: classLabel(kind, row),
@@ -24,7 +29,7 @@ export function FrequencyChart({
   const y = niceAxis(Math.max(...data.flatMap((d) => [d.observed, d.expected])));
   return (
     <Figure
-      title="Gözlenen ve beklenen frekanslar"
+      title={title}
       description="Her sınıf için Oᵢ ve Eᵢ. Aynı sayılar hesap tablolarında da yer alır."
     >
       <Legend
@@ -33,7 +38,7 @@ export function FrequencyChart({
           { label: 'Beklenen Eᵢ', swatch: 'h-3 bg-model' },
         ]}
       />
-      <ResponsiveContainer width="100%" height={340}>
+      <ResponsiveContainer width={width} height={340}>
         <BarChart data={data} barGap={2} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
           <CartesianGrid vertical={false} stroke={COLORS.grid} />
           <XAxis

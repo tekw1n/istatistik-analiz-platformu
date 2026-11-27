@@ -1,4 +1,13 @@
-import { Fragment, useId, useState, type ClipboardEvent } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ClipboardEvent,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react';
 import type { CellError } from '../types';
 
 export interface Column<R> {
@@ -22,6 +31,8 @@ interface Props<R> {
   /** Read-only column computed from a row, shown before the last column. */
   derived?: { label: string; value(row: R, index: number): string };
   total: number;
+  /** Table controls shown beside "add row". */
+  toolbar?: ReactNode;
 }
 
 export function EditableTable<R extends object>({
@@ -34,6 +45,7 @@ export function EditableTable<R extends object>({
   onPasteText,
   derived,
   total,
+  toolbar,
 }: Props<R>) {
   const id = useId();
   // An empty cell is not reported until the user has left it.
@@ -44,6 +56,34 @@ export function EditableTable<R extends object>({
     if (!/[\t\n]/.test(text.trim())) return;
     event.preventDefault();
     onPasteText(text, row);
+  };
+
+  // The cell to focus once the rows have been rendered again.
+  const pending = useRef<string | null>(null);
+  useEffect(() => {
+    if (pending.current === null) return;
+    document.getElementById(pending.current)?.focus();
+    pending.current = null;
+  });
+
+  const cellId = (row: number, field: string) => `${id}-cell-${row}-${field}`;
+  /** The first column of a row that can be typed in. */
+  const firstField = (row: number, count: number) =>
+    (columns.find((c) => !c.disabledText?.(row, count)) ?? columns[0]!).field;
+
+  const addRow = (field?: string) => {
+    const count = rows.length + 1;
+    pending.current = cellId(rows.length, field ?? firstField(rows.length, count));
+    onChange([...rows, emptyRow(rows[rows.length - 1])]);
+  };
+
+  // Enter moves down a column (adding a row after the last one), Shift+Enter moves up.
+  const move = (event: KeyboardEvent, row: number, field: string) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    const next = row + (event.shiftKey ? -1 : 1);
+    if (next === rows.length) addRow(field);
+    else if (next >= 0) document.getElementById(cellId(next, field))?.focus();
   };
 
   const set = (row: number, field: keyof R, value: string) =>
@@ -97,6 +137,7 @@ export function EditableTable<R extends object>({
                       )}
                       <td className="min-w-20">
                         <input
+                          id={cellId(i, column.field)}
                           className="field num"
                           type="text"
                           inputMode={column.inputMode}
@@ -108,6 +149,7 @@ export function EditableTable<R extends object>({
                           onChange={(e) => set(i, column.field, e.target.value)}
                           onBlur={() => setTouched((t) => new Set(t).add(key))}
                           onPaste={(e) => paste(e, i)}
+                          onKeyDown={(e) => move(e, i, column.field)}
                         />
                         {shown && (
                           <p id={errorId} className="mt-1 text-xs text-danger">
@@ -126,6 +168,9 @@ export function EditableTable<R extends object>({
                     disabled={rows.length === 1}
                     onClick={() => {
                       setTouched(new Set());
+                      // The focused button disappears, so focus moves to the row taking its place.
+                      const row = Math.min(i, rows.length - 2);
+                      pending.current = cellId(row, firstField(row, rows.length - 1));
                       onChange(rows.filter((_, j) => j !== i));
                     }}
                   >
@@ -146,16 +191,19 @@ export function EditableTable<R extends object>({
           </tfoot>
         </table>
       </div>
-      <button
-        type="button"
-        className="btn-secondary"
-        onClick={() => onChange([...rows, emptyRow(rows[rows.length - 1])])}
+      <div
+        role="group"
+        aria-label="Tablo araçları"
+        className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-md border border-line bg-muted p-3"
       >
-        Satır ekle
-      </button>
+        <button type="button" className="btn-secondary" onClick={() => addRow()}>
+          Satır ekle
+        </button>
+        {toolbar}
+      </div>
       <p className="hint">
         Excel’den kopyaladığınız hücreleri herhangi bir kutuya yapıştırabilirsiniz; tablo o satırdan
-        itibaren yenilenir.
+        itibaren yenilenir. Enter alttaki hücreye geçer, Shift + Enter üsttekine.
       </p>
     </div>
   );

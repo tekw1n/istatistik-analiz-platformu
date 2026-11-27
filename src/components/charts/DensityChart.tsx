@@ -19,10 +19,13 @@ export function DensityChart({
   name,
   distribution,
   classes,
+  width = '100%',
 }: {
   name: string;
   distribution: ContinuousDistribution;
   classes: DataClass[];
+  /** A fixed pixel width for printing; the chart follows its container otherwise. */
+  width?: number | '100%';
 }) {
   const { points, domain, yMax, clipped, omitted } = densityChart(distribution, classes);
   const y = niceAxis(yMax);
@@ -37,7 +40,7 @@ export function DensityChart({
           { label: 'Teorik yoğunluk f(x)', swatch: 'h-0.5 bg-model' },
         ]}
       />
-      <ResponsiveContainer width="100%" height={340}>
+      <ResponsiveContainer width={width} height={340}>
         <ComposedChart data={points} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
           <CartesianGrid vertical={false} stroke={COLORS.grid} />
           <XAxis

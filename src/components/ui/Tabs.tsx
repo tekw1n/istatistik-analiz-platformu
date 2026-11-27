@@ -10,20 +10,30 @@ interface Props<T extends string> {
   onSelect: (id: NoInfer<T>) => void;
 }
 
-/** A tab list with arrow key navigation. Pair it with `TabPanel`. */
+/** A tab list with arrow, Home and End key navigation. Pair it with `TabPanel`. */
 export function Tabs<T extends string>({ label, name, tabs, active, onSelect }: Props<T>) {
   const move = (event: KeyboardEvent) => {
-    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
-    if (!step) return;
-    event.preventDefault();
     const index = tabs.findIndex((t) => t.id === active);
-    const next = tabs[(index + step + tabs.length) % tabs.length]!;
+    const target: Record<string, number> = {
+      ArrowRight: (index + 1) % tabs.length,
+      ArrowLeft: (index - 1 + tabs.length) % tabs.length,
+      Home: 0,
+      End: tabs.length - 1,
+    };
+    const position = target[event.key];
+    if (position === undefined) return;
+    event.preventDefault();
+    const next = tabs[position]!;
     onSelect(next.id);
     document.getElementById(`${name}-tab-${next.id}`)?.focus();
   };
 
   return (
-    <div role="tablist" aria-label={label} className="flex flex-wrap border-b border-line">
+    <div
+      role="tablist"
+      aria-label={label}
+      className="flex flex-wrap border-b border-line print:hidden"
+    >
       {tabs.map((tab) => (
         <button
           key={tab.id}
