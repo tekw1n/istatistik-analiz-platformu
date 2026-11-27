@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { ChiSquareResult, FittedModel } from '../../chiSquare/types';
+import { canEvaluate } from '../../components/charts/chartData';
 import { Choices } from '../../components/ui/Choices';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { DISTRIBUTIONS, type DistributionId } from '../../distributions/catalog';
 import type { EstimationOptions, Observations } from '../../distributions/estimation/types';
 import type { CalculatorInput } from '../probability-calculator/calculate';
@@ -31,6 +33,15 @@ export default function Visuals({
   const { name, create, mean } = DISTRIBUTIONS[id];
   // The binomial n of the model replaces the known n.
   const distribution = create(model.params, options);
+
+  if (!canEvaluate(distribution)) {
+    return (
+      <EmptyState tone="error" title="Grafik ve olasılık hesaplanamıyor">
+        Bu parametre değerleri sayısal hesaplamanın sınırını aşıyor (yaklaşık bir milyondan büyük
+        şekil veya ortalama). Verinin ölçeğini küçültmeyi veya başka bir dağılım seçmeyi deneyin.
+      </EmptyState>
+    );
+  }
 
   const hasMerged = result !== null && result.mergedRows.length > 0;
   const rows = result && (table === 'merged' && hasMerged ? result.mergedRows : result.rawRows);

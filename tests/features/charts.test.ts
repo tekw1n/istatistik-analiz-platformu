@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canEvaluate,
   densityChart,
   densityRegion,
   niceAxis,
@@ -46,6 +47,15 @@ describe('ticks', () => {
     expect(niceAxis(24)).toEqual({ top: 25, ticks: [0, 5, 10, 15, 20, 25] });
     expect(niceAxis(0.033).ticks.at(-1)).toBeGreaterThanOrEqual(0.033);
     expect(niceAxis(0)).toEqual({ top: 1, ticks: [0, 1] });
+  });
+});
+
+describe('numeric limit', () => {
+  it('detects parameters the special functions cannot evaluate', () => {
+    expect(canEvaluate(gammaDistribution(5e9, 2e-7))).toBe(false);
+    expect(canEvaluate(poisson(1e9))).toBe(false);
+    expect(canEvaluate(poisson(100_000))).toBe(true);
+    expect(canEvaluate(normal(1e9, 1))).toBe(true);
   });
 });
 
