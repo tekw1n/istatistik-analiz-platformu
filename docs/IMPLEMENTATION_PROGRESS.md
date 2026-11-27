@@ -103,7 +103,7 @@ Rules:
 | Phase | Status | Branch | Commits | PR | Tests |
 |---|---|---|---|---|---|
 | Bootstrap | Done | `main` | `7f91b34` | — | — |
-| 0 | In progress | `chore/phase-00-project-setup` | — | — | No code yet |
+| 0 | Done, awaiting user approval | `chore/phase-00-project-setup` | `50295a5` and the progress-record commit | [#1](https://github.com/tekw1n/istatistik-analiz-platformu/pull/1) | Not applicable, no code yet |
 | 1–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
