@@ -108,7 +108,7 @@ Rules:
 | 1 | Done, approved; merged as `f579184` | `feat/phase-01-math-core` | `a0e512e`, `e0255d1`, `a6c88f2`, `b150115` | [#2](https://github.com/tekw1n/istatistik-analiz-platformu/pull/2) | 264 passed, build succeeds |
 | 2 | Done, approved; merged as `8c1afa7` | `feat/phase-02-distributions` | `d84dfd5`, `8b914f1`, `4b7bc9b`, `9d0e249`, `30b2b8d` | [#3](https://github.com/tekw1n/istatistik-analiz-platformu/pull/3) | 426 passed in total, build succeeds |
 | 3 | Done, approved; merged as `d38d807` | `feat/phase-03-parameter-estimation` | `bbcb668`, `ce0d85a`, `d05d9a6`, `ad113e0`, `c6e21cb`, `d1355de` | [#4](https://github.com/tekw1n/istatistik-analiz-platformu/pull/4) | 481 passed in total, build succeeds |
-| 4 | Done, awaiting user approval | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | PR_LINK | 515 passed, build succeeds |
+| 4 | Done, awaiting user approval | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | [#5](https://github.com/tekw1n/istatistik-analiz-platformu/pull/5) | 515 passed, build succeeds |
 | 5–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
