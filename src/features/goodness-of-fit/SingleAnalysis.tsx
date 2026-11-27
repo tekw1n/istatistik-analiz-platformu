@@ -49,9 +49,11 @@ export function SingleAnalysis({ dataset, settings, onChange, onReport, hidden }
       )}
 
       {id && unusable && (
-        <EmptyState tone="error" title="Bu dağılım mevcut veriye uygulanamaz">
-          {unusable} Başka bir dağılım seçin veya veriyi düzenleyin.
-        </EmptyState>
+        <div role="alert">
+          <EmptyState tone="error" title="Bu dağılım mevcut veriye uygulanamaz">
+            {unusable} Başka bir dağılım seçin veya veriyi düzenleyin.
+          </EmptyState>
+        </div>
       )}
 
       {id && estimates && !unusable && (

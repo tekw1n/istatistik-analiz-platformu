@@ -38,8 +38,8 @@ export function DataTable({ observations }: { observations: Observations }) {
       <table className="data-table tabular-nums">
         <thead>
           <tr>
-            {head.map((title) => (
-              <th key={title} scope="col" className="text-right">
+            {head.map((title, c) => (
+              <th key={title} scope="col" className={c === 0 ? undefined : '!text-right'}>
                 {title}
               </th>
             ))}
@@ -49,7 +49,7 @@ export function DataTable({ observations }: { observations: Observations }) {
           {rows.slice(0, MAX_ROWS).map((cells, i) => (
             <tr key={i}>
               {cells.map((cell, c) => (
-                <td key={c} className="num">
+                <td key={c} className={c === 0 ? 'font-mono' : 'num'}>
                   {cell}
                 </td>
               ))}
@@ -58,7 +58,7 @@ export function DataTable({ observations }: { observations: Observations }) {
         </tbody>
         <tfoot>
           <tr>
-            <td colSpan={head.length - 1} className="text-right">
+            <td colSpan={head.length - 1}>
               N = Σ fᵢ
             </td>
             <td className="num">{formatNumber(total)}</td>

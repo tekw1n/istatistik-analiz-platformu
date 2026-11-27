@@ -123,6 +123,17 @@ describe('raw data and frequency tables', () => {
     expect(discrete.mle.available && discrete.mle.notes.join(' ')).not.toContain('yaklaşıktır');
   });
 
+  it('names the actual source of an approximate p-value', () => {
+    const note = (e: Estimation) => (e.available ? e.pValueNote : undefined);
+    const grouped = estimateParameters('normal', classes([0, 2, 4, 6, 8], [3, 9, 8, 2]));
+    expect(note(grouped.mm)).toContain('sınıf orta noktalarından');
+    expect(note(grouped.mm)).not.toContain('gözlem değerlerinden');
+    expect(note(grouped.mle)).toBeUndefined();
+    expect(note(estimateParameters('normal', raw(data)).mle)).toContain('gözlem değerlerinden');
+    const typed = manualParameters('poisson', [{ value: 1, estimatedFromData: true }]);
+    expect(typed.pValueNote).toContain('kestirim yöntemi bilinmiyor');
+  });
+
   it('counts only p for the binomial distribution', () => {
     const { mle } = estimateParameters('binomial', raw(data), { n: 10 });
     expect(mle.available && mle.estimatedCount).toBe(1);

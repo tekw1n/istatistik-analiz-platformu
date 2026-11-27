@@ -60,6 +60,16 @@ export function visibleRange(distribution: Distribution): [number, number] {
   return [quantile(distribution, 0.001), quantile(distribution, 0.999)];
 }
 
+/** False when the parameters are beyond what the special functions can evaluate. */
+export function canEvaluate(distribution: Distribution): boolean {
+  try {
+    visibleRange(distribution);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Evenly spaced points of [from, to] plus the given breakpoints, each with a neighbour just
  * below it, so that jumps of a density or a histogram are drawn vertically.
