@@ -32,6 +32,8 @@ CDF = {
 
 def grouped(name, bounds, frequencies, start):
     cdf = CDF[name]
+    # The end classes are opened to the tails, so the class probabilities sum to 1.
+    bounds = [-INF, *bounds[1:-1], INF]
 
     def loglik(*theta):
         return fsum(f * log(cdf(hi, *theta) - cdf(lo, *theta))

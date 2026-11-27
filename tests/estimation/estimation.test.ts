@@ -104,10 +104,23 @@ describe('raw data and frequency tables', () => {
         expect(sigma!.value ** 2).toBeCloseTo(variance!.value, 12);
         expect(e.notes.join(' ')).toContain("N'e bölünen m₂");
         expect(e.estimatedCount).toBe(2);
-        expect(e.pValueApproximate).toBe(true);
-        expect(e.notes.join(' ')).toContain('p-değeri yaklaşıktır');
       }
     }
+  });
+
+  it('flags the p-value as approximate depending on how the estimate was obtained', () => {
+    const flags = (e: Estimation) =>
+      e.available && [e.pValueApproximate, e.approximateIfMerged];
+    const continuous = estimateParameters('normal', raw(data));
+    expect(flags(continuous.mm)).toEqual([true, false]);
+    expect(flags(continuous.mle)).toEqual([true, false]);
+    expect(continuous.mle.available && continuous.mle.notes.join(' ')).toContain(
+      'p-değeri yaklaşıktır',
+    );
+    const discrete = estimateParameters('poisson', raw([0, 1, 2], [3, 4, 5]));
+    expect(flags(discrete.mm)).toEqual([true, false]);
+    expect(flags(discrete.mle)).toEqual([false, true]);
+    expect(discrete.mle.available && discrete.mle.notes.join(' ')).not.toContain('yaklaşıktır');
   });
 
   it('counts only p for the binomial distribution', () => {
@@ -135,7 +148,10 @@ describe('grouped data', () => {
     const numeric = bounds.map((b, i) => b ?? (i === 0 ? -Infinity : Infinity));
     const { mle } = estimateParameters(id, classes(numeric, frequencies));
     expectParams(mle, expected, 1e-6);
-    expect(mle.available && mle.pValueApproximate).toBe(false);
+    expect(mle.available && [mle.pValueApproximate, mle.approximateIfMerged]).toEqual([
+      false,
+      true,
+    ]);
   });
 
   it('matches the closed form for equal width exponential classes', () => {
