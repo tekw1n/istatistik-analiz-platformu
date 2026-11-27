@@ -113,7 +113,7 @@ Rules:
 | 6 | Done, approved; merged as `3115206` | `feat/phase-06-analysis-ui` | `6f94ca2`, `3635657`, `84c2e23`, `4e60178` | [#7](https://github.com/tekw1n/istatistik-analiz-platformu/pull/7) | 650 passed, build succeeds; browser smoke test (Chromium) |
 | 7 | Done, approved; merged as `e6d5567` | `feat/phase-07-charts-calculator` | `405f2e1`, `b8ee413`, `41c136c` | [#8](https://github.com/tekw1n/istatistik-analiz-platformu/pull/8) | 677 passed, build succeeds; browser smoke test (Chromium) |
 | 8 | Done, approved; merged as `8e21532` | `feat/phase-08-reporting-design` | `7cfee42`, `949997a`, `7a36854`, `44f4256` | [#9](https://github.com/tekw1n/istatistik-analiz-platformu/pull/9) | 703 passed, build succeeds; keyboard, report and PDF smoke test (Chromium) |
-| 9 | Done, awaiting user approval | `test/phase-09-final-validation` | `b4e1b54`, `a91d37f`, `ba9741e`, `1d483eb`, `651198d`, `c5f12bd`, `c94737d` | PR_LINK | 772 passed, build succeeds without warnings; references reproduced; browser tests on a subdirectory build |
+| 9 | Done, awaiting user approval | `test/phase-09-final-validation` | `b4e1b54`, `a91d37f`, `ba9741e`, `1d483eb`, `651198d`, `c5f12bd`, `c94737d` | [#10](https://github.com/tekw1n/istatistik-analiz-platformu/pull/10) | 772 passed, build succeeds without warnings; references reproduced; browser tests on a subdirectory build |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
