@@ -80,26 +80,28 @@ export function GroupedForm({ initial, onDataset }: Props) {
           setOpenLast(pasted.openLast ?? false);
         }}
         total={result.total}
+        toolbar={
+          <fieldset className="flex flex-wrap gap-x-6">
+            <legend className="sr-only">Açık uçlu sınıflar</legend>
+            {(
+              [
+                ['İlk sınıf alttan açık', openFirst, setOpenFirst],
+                ['Son sınıf üstten açık', openLast, setOpenLast],
+              ] as const
+            ).map(([label, checked, set]) => (
+              <label key={label} className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+                <input
+                  type="checkbox"
+                  className="size-5 accent-primary"
+                  checked={checked}
+                  onChange={(e) => set(e.target.checked)}
+                />
+                {label}
+              </label>
+            ))}
+          </fieldset>
+        }
       />
-      <fieldset className="flex flex-wrap gap-x-6">
-        <legend className="sr-only">Açık uçlu sınıflar</legend>
-        {(
-          [
-            ['İlk sınıf alttan açık', openFirst, setOpenFirst],
-            ['Son sınıf üstten açık', openLast, setOpenLast],
-          ] as const
-        ).map(([label, checked, set]) => (
-          <label key={label} className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
-            <input
-              type="checkbox"
-              className="size-5 accent-primary"
-              checked={checked}
-              onChange={(e) => set(e.target.checked)}
-            />
-            {label}
-          </label>
-        ))}
-      </fieldset>
       <p className="hint">
         Sınıflar bitişik olmalıdır: her sınıfın alt sınırı bir önceki sınıfın üst sınırına eşit
         olur (örneğin 10–20, 20–30).
