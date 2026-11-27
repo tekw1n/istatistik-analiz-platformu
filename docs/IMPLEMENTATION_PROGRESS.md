@@ -109,22 +109,24 @@ Rules:
 | 2 | Done, approved; merged as `8c1afa7` | `feat/phase-02-distributions` | `d84dfd5`, `8b914f1`, `4b7bc9b`, `9d0e249`, `30b2b8d` | [#3](https://github.com/tekw1n/istatistik-analiz-platformu/pull/3) | 426 passed in total, build succeeds |
 | 3 | Done, approved; merged as `d38d807` | `feat/phase-03-parameter-estimation` | `bbcb668`, `ce0d85a`, `d05d9a6`, `ad113e0`, `c6e21cb`, `d1355de` | [#4](https://github.com/tekw1n/istatistik-analiz-platformu/pull/4) | 481 passed in total, build succeeds |
 | 4 | Done, approved; merged as `244c2e1` | `feat/phase-04-chi-square-engine` | `d1d7744`, `cec902e`, `5251e9f`, `53601fb`, `fabde07` | [#5](https://github.com/tekw1n/istatistik-analiz-platformu/pull/5) | 515 passed, build succeeds |
-| 5 | Done, awaiting user approval | `feat/phase-05-data-entry` | `4dcdba7`, `8f7f301`, `9435130`, `869fd75`, `d4f8549` | [#6](https://github.com/tekw1n/istatistik-analiz-platformu/pull/6) | 601 passed, build succeeds; manual browser smoke test (Chromium) |
-| 6–9 | Not started | | | | |
+| 5 | Done, approved; merged as `0f30cbd` | `feat/phase-05-data-entry` | `4dcdba7`, `8f7f301`, `9435130`, `869fd75`, `d4f8549` | [#6](https://github.com/tekw1n/istatistik-analiz-platformu/pull/6) | 601 passed, build succeeds; manual browser smoke test (Chromium) |
+| 6 | Done, awaiting user approval | `feat/phase-06-analysis-ui` | `6f94ca2`, `3635657`, `84c2e23`, `4e60178` | PR_LINK | 650 passed, build succeeds; browser smoke test (Chromium) |
+| 7–9 | Not started | | | | |
 
 Merge commit hashes are recorded at the start of the following phase, because a commit cannot contain its own merge hash.
 
 ## Known bugs and gaps
 
-- The UI covers data entry only. Recharts and KaTeX are added in the phases that first use them.
+- Charts and the probability calculator are not built yet (Recharts is added in Phase 7).
+- The production bundle is one chunk above 500 kB (KaTeX); Vite warns about it.
+- Open point: with grouped data the end classes are opened to ±∞, so a Continuous Uniform fit can give a negative lower bound even for non-negative data (for example a = −4,72 in the service time sample). Raised in the Phase 6 report.
+- Tables show at most 500 rows (totals cover all rows).
 - There are no automated UI component tests; parsing, validation and samples are unit tested.
-- Support checks that depend on the distribution (for example Binomial 0..n) run when a distribution is chosen (Phase 6).
 - Raw data entries accept one variable of at most 100,000 values; CSV files up to 5 MB. Quoted fields spanning several lines are not supported.
 - `regularizedGammaP/Q` are limited to shapes up to about 1e6 (see the `shortcut:` comment in `src/math/gamma.ts`).
 - Binomial supports n up to 1e6 (tails are summed term by term); Poisson and Gamma inherit the incomplete gamma limit.
 - The chi-square test allows at most 10,000 discrete classes (for example Binomial n above 9,999 is rejected).
 - By user decision, Poisson, Geometric and Discrete Uniform fits without an E < 5 merge are not flagged as approximate, although a tail closed as X ≥ k (or the non-regular min/max estimator) makes them slightly so.
-- Engine messages print numbers with a decimal point; Phase 6 should format them for Turkish.
 - `integrate` handles finite intervals only and can miss a feature narrower than 1/32 of the interval.
 
 ## Phase 1 decisions
@@ -174,9 +176,17 @@ Merge commit hashes are recorded at the start of the following phase, because a 
 - Design system: light theme, tokens in `src/index.css` (`@theme`), system fonts (no external requests), tabular figures for numbers, 44px controls.
 - Five samples (Poisson, Binomial, Discrete Uniform, Exponential, Normal); three of them show E < 5 merging. References come from `tests/data-entry/generate_sample_references.py`.
 
-## Next: Phase 6
+## Phase 6 decisions
 
-1. Preliminary analysis cards and distribution selection with support filtering.
-2. Parameter estimation screen (MM, MLE, manual), single analysis and automatic comparison.
-3. Raw and merged calculation tables, merge history, decision screen; format engine messages for Turkish.
-4. Preselect distribution, mode and α when a sample is loaded.
+- All numbers go through `formatNumber` / `texNumber` (`src/utils/format.ts`): decimal comma, scientific notation below 1e-4.
+- Flow: data entry → preliminary analysis → tabs "single analysis" / "comparison". Settings live in `App` and a loaded sample presets distribution, mode, α, n and manual values.
+- Distribution filtering ignores the Binomial n; violations of 0..n are reported once n is entered.
+- A discrete frequency table cannot be used with continuous distributions.
+- The comparison uses MLE (moments only without a likelihood solution), lists invalid and inapplicable distributions separately and sorts valid tests by p-value with a warning.
+- The raw table marks E < 5 rows with colour and text; only the final table totals to χ².
+- A formula bug from Phase 3 (a lost backslash printed ";" in two formulas) was found and fixed.
+
+## Next: Phase 7
+
+1. Observed / expected frequency charts and theoretical curves (Recharts).
+2. Interactive probability calculator: P(X = a), P(X ≤ a), P(a ≤ X ≤ b).
