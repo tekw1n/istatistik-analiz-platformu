@@ -8,6 +8,8 @@ export type TestedRow = {
   id: DistributionId;
   method: Method;
   params: number[];
+  /** Estimation notes that warn about the fit itself. */
+  warnings: string[];
   result: Extract<ChiSquareResult, { status: 'ok' }>;
 };
 
@@ -60,6 +62,7 @@ export function compareDistributions(
         id,
         method: chosen.method,
         params: chosen.params,
+        warnings: chosen.notes.filter((note) => note.startsWith('Uyarı:')),
         result: outcome.value,
       });
     }

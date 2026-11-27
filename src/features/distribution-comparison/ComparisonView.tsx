@@ -83,7 +83,7 @@ export function ComparisonView({
                   </tr>
                 </thead>
                 <tbody>
-                  {comparison.tested.map(({ id, method, params, result }) => (
+                  {comparison.tested.map(({ id, method, params, warnings, result }) => (
                     <tr key={id}>
                       <th scope="row" className="!border-b !border-line">
                         {DISTRIBUTIONS[id].name}
@@ -93,6 +93,14 @@ export function ComparisonView({
                         {DISTRIBUTIONS[id].parameters.map((p, i) => (
                           <span key={p.symbol} className="block whitespace-nowrap">
                             {p.symbol} = {formatNumber(params[i]!, 4)}
+                          </span>
+                        ))}
+                        {warnings.map((warning) => (
+                          <span
+                            key={warning}
+                            className="mt-1 block max-w-xs font-sans text-xs text-warning"
+                          >
+                            {warning}
                           </span>
                         ))}
                       </td>
