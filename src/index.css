@@ -85,6 +85,13 @@
   .data-table tfoot td {
     @apply border-t-2 border-b-0 border-ink font-semibold;
   }
+  .badge {
+    @apply inline-block rounded-sm border border-primary bg-surface px-1.5 text-xs font-semibold text-primary;
+  }
+  .badge-warning {
+    @apply border-warning text-warning;
+  }
+
   .data-table input.field {
     @apply px-2 sm:px-3;
   }
